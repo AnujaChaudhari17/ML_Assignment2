@@ -15,92 +15,11 @@
     
 
 
-```python
-def full_batch_gd(x, y, alpha=0.001, epochs=1000, epsilon=1e-3, start_theta=(1.0, 1.0), min_loss=None):
-    """
-    Performs Full Batch Gradient Descent on y = t0 + t1*x
-    Returns trajectory, loss dict, convergence info
-    """
-    t0 = torch.tensor(start_theta[0], requires_grad=True)
-    t1 = torch.tensor(start_theta[1], requires_grad=True)
-    num_samples = len(x)
-
-    t0_values, t1_values, loss_values = [], [], []
-    loss_dict = {}
-
-    for epoch in range(1, epochs + 1):
-        yp = t0 + t1 * x
-        loss = torch.mean((y - yp) ** 2)
-        loss.backward()
-        # Store data
-        loss_dict[epoch] = loss.item()
-        with torch.no_grad():
-            t0 -= alpha * t0.grad
-            t1 -= alpha * t1.grad
-
-        
-        t0_values.append(t0.item())
-        t1_values.append(t1.item())
-        loss_values.append(loss.item())
-
-        # Reset gradients
-        t0.grad.zero_()
-        t1.grad.zero_()
-
-    # Convergence detection
-    converge_epoch, converge_loss = None, None
-    if min_loss is not None:
-        for epoch in loss_dict.keys():
-            if abs(loss_dict[epoch] - min_loss) <= epsilon:
-                converge_epoch = epoch
-                converge_loss = loss_dict[epoch]
-                break
-              
-    return {
-        "t0_values": t0_values,
-        "t1_values": t1_values,
-        "loss_values": loss_values,
-        "loss_dict": loss_dict,
-        "final_t0": t0.item(),
-        "final_t1": t1.item(),
-        "converge_epoch": converge_epoch,
-        "converge_loss": converge_loss,
-    }
-```
-
-
-```python
-def plot_loss_vs_epoch(loss_dict, converge_epoch=None, converge_loss=None):
-    plt.figure(figsize=(6, 4))
-    plt.plot(loss_dict.keys(), loss_dict.values(), label='Loss Curve')
-    if converge_epoch is not None:
-        plt.plot(converge_epoch, converge_loss, 'ro', label='Convergence Point')
-    plt.xlabel("Epochs")
-    plt.ylabel("Loss")
-    plt.title("Loss vs Epochs")
-    plt.legend()
-    plt.show()
-```
 
 ### Plot of Loss vs Epoch for Full Batch Gradient Descent
 
 
-```python
 
-# Convert x1, y to PyTorch tensors
-x_tensor = torch.tensor(x1, dtype=torch.float64)
-y_tensor = torch.tensor(y, dtype=torch.float64)
-
-# Run Gradient Descent
-res = full_batch_gd(
-    x_tensor, y_tensor,
-    alpha=0.01, epochs=15, epsilon=0.01,
-    start_theta=(1.0, 1.0), min_loss=min_loss
-)
-
-# Plot results
-plot_loss_vs_epoch(res["loss_dict"], res["converge_epoch"], res["converge_loss"])
-```
 
 
     
@@ -109,18 +28,7 @@ plot_loss_vs_epoch(res["loss_dict"], res["converge_epoch"], res["converge_loss"]
 
 
 
-```python
-res = full_batch_gd(
-    x_tensor, y_tensor,
-    alpha=0.01, epochs=1000, epsilon=0.001,
-    start_theta=(1.0, 1.0), min_loss=min_loss
-)
-print(res["converge_epoch"])
-# Plot results
-plot_loss_vs_epoch(res["loss_dict"], res["converge_epoch"], res["converge_loss"])
-```
 
-    584
     
 
 
@@ -132,101 +40,7 @@ plot_loss_vs_epoch(res["loss_dict"], res["converge_epoch"], res["converge_loss"]
 ### Contour Plot for Full Batch Gradient Descent
 
 
-```python
-t0_values = res['t0_values']
-t1_values = res['t1_values']
-loss_values = res['loss_values']
 
-# If you want the final minimum point
-min_t0 = res['final_t0']
-min_t1 = res['final_t1']
-t0_grid = np.linspace(min(t0_values) - 1, max(t0_values) + 1, 100)
-t1_grid = np.linspace(min(t1_values) - 1, max(t1_values) + 1, 100)
-T0, T1 = np.meshgrid(t0_grid, t1_grid)
-
-# Calculate the loss function at each point of the grid
-loss_grid = np.zeros_like(T0)
-for i in range(len(t0_grid)):
-    for j in range(len(t1_grid)):
-        loss_grid[i, j] = np.mean((y - (T0[i, j] + T1[i, j] * x1)) ** 2)
-
-# Plotting the contour map
-plt.contourf(T0, T1, loss_grid, levels=50, cmap='viridis')
-plt.colorbar(label='Loss')
-
-# Plot the trajectory of t0 and t1 during the 2500 epochs
-plt.plot(t0_values, t1_values, marker='o', color='red', label='Trajectory')
-plt.scatter(t0_values, t1_values, c='red')
-plt.xlabel("t0")
-plt.ylabel("t1")
-plt.title("Contour Plot visualization of Loss Function over 1000 Epochs")
-plt.legend()
-
-# Mark the starting point and the minima point
-plt.scatter(t0_values[0], t1_values[0], c='blue', s=100, label='Start Point')  # Start
-plt.scatter(min_t0, min_t1, c='yellow', s=100, label='Minima')  # Minima
-
-plt.legend()
-plt.show()
-
-# Create a folder to store frames temporarily
-frames_folder = "trajectory_frames"
-if not os.path.exists(frames_folder):
-    os.makedirs(frames_folder)
-
-filenames = []
-
-# Plot the trajectory of t0 and t1 during the first 15 epochs
-for i in range(15):
-    plt.contourf(T0, T1, loss_grid, levels=50, cmap='viridis')
-    plt.colorbar(label='Loss')
-    
-    # Plot trajectory
-    plt.plot(t0_values[0:i+1], t1_values[0:i+1], marker='o', color='red', label='Trajectory')
-    plt.scatter(t0_values[0:i+1], t1_values[0:i+1], c='red')
-    
-    plt.xlabel("t0")
-    plt.ylabel("t1")
-    plt.title(f"Contour Plot of Loss Function over {i+1} Epochs")
-    
-    # Mark the starting point and the ending point (minimized point)
-    plt.scatter(t0_values[0], t1_values[0], c='blue', s=100, label='Start Point')  # Start
-    plt.scatter(t0_values[-1], t1_values[-1], c='yellow', s=100, label='Minima')  # Minima
-
-    plt.legend()
-    
-    # Save the frame
-    filename = os.path.join(frames_folder, f"frame_{i:03d}.png")
-    plt.savefig(filename)
-    filenames.append(filename)
-    
-    plt.close()
-
-# Create a folder to store the final GIF permanently
-results_folder = "results"
-if not os.path.exists(results_folder):
-    os.makedirs(results_folder)
-
-gif_filename = os.path.join(results_folder, "trajectory_bgd_no_momentum.gif")
-
-# Create the GIF
-with imageio.get_writer(gif_filename, mode='I', duration=0.5, loop=0) as writer:
-    for filename in filenames:
-        image = imageio.imread(filename)
-        writer.append_data(image)
-
-# Cleanup temporary frames
-import shutil
-
-try:
-    for filename in filenames:
-        os.remove(filename)
-    shutil.rmtree(frames_folder, ignore_errors=True)
-    print(f"GIF saved permanently at: {gif_filename}")
-except Exception as e:
-    print(f"Cleanup failed: {e}")
-
-```
 
 
     
@@ -244,27 +58,9 @@ except Exception as e:
 ### Average Convergence Steps for Full Batch Gradient Descent
 
 
-```python
-def average_convergence(x, y, start_points, alpha=0.01, epochs=1000, epsilon=1e-3, min_loss=None):
-    total_epochs = 0
-    valid_runs = 0
-
-    for start_theta in start_points:
-        result = full_batch_gd(x, y, alpha, epochs, epsilon, start_theta, min_loss)
-        if result["converge_epoch"] is not None:
-            total_epochs += result["converge_epoch"]
-            valid_runs += 1
-
-    avg_steps = total_epochs / valid_runs if valid_runs > 0 else None
-    print(f" Average convergence steps across {valid_runs} runs: {avg_steps}")
-    return avg_steps
-```
 
 
-```python
-start_thetas = [(np.random.uniform(-5, 5), np.random.uniform(-5, 5)) for _ in range(5)]
-average_convergence(x_tensor, y_tensor, start_thetas, alpha=0.01, epochs=1000, epsilon=0.01, min_loss=min_loss)
-```
+
 
      Average convergence steps across 5 runs: 554.6
     
@@ -272,96 +68,18 @@ average_convergence(x_tensor, y_tensor, start_thetas, alpha=0.01, epochs=1000, e
 
 
 
-    554.6
+    
 
 
 
 ### Stochastic Gradient Descent
 
 
-```python
-def stochastic_gd(x, y, alpha=0.01, epochs=50, epsilon=1e-3, start_theta=(1.0, 1.0), min_loss=None):
-    """
-    Performs Stochastic Gradient Descent (SGD) on y = t0 + t1*x
-    Returns trajectory, loss dict, and convergence info
-    """
-    num_samples = len(x)
-    
-    # Initialize parameters
-    t0 = torch.tensor(start_theta[0], requires_grad=True)
-    t1 = torch.tensor(start_theta[1], requires_grad=True)
-
-    # Lists to store the trajectory for plotting
-    t0_values, t1_values, loss_values = [], [], []
-    loss_dict = {}
-
-    for epoch in range(1, epochs + 1):
-        for i in range(num_samples):
-            # Compute loss for a single sample
-            yp = t0 + t1 * x[i]
-            loss = (y[i] - yp) ** 2
-            loss.backward()
-
-            # Update parameters
-            with torch.no_grad():
-                t0 -= alpha * t0.grad
-                t1 -= alpha * t1.grad
-
-            # Reset gradients
-            t0.grad.zero_()
-            t1.grad.zero_()
-
-        # Compute loss for the full dataset after the epoch
-        yp_full = t0 + t1 * x
-        full_loss = torch.mean((y - yp_full) ** 2)
-        loss_dict[epoch] = full_loss.item()
-
-        # Store trajectory
-        t0_values.append(t0.item())
-        t1_values.append(t1.item())
-        loss_values.append(full_loss.item())
-
-        
-        
-
-    # Convergence detection
-    converge_epoch, converge_loss = None, None
-    if min_loss is not None:
-        for epoch in loss_dict.keys():
-            if abs(loss_dict[epoch] - min_loss) <= epsilon:
-                converge_epoch = epoch
-                converge_loss = loss_dict[epoch]
-                break
-
-    return {
-        "t0_values": t0_values,
-        "t1_values": t1_values,
-        "loss_values": loss_values,
-        "loss_dict": loss_dict,
-        "final_t0": t0.item(),
-        "final_t1": t1.item(),
-        "converge_epoch": converge_epoch,
-        "converge_loss": converge_loss,
-    }
-
-```
 
 ### Plot of Loss vs Epoch for Stochastic Gradient Descent
 
 
-```python
-res = stochastic_gd(
-    x_tensor, y_tensor,
-    alpha=0.01, epochs=50, epsilon=0.001,
-    start_theta=(1.0, 1.0), min_loss=min_loss
-)
-print(res["converge_epoch"])
-# Plot results
-plot_loss_vs_epoch(res["loss_dict"], res["converge_epoch"], res["converge_loss"])
-```
 
-    17
-    
 
 
     
@@ -372,99 +90,6 @@ plot_loss_vs_epoch(res["loss_dict"], res["converge_epoch"], res["converge_loss"]
 ### Contour Plot for Stochastic gradient Descent
 
 
-```python
-t0_values = res['t0_values']
-t1_values = res['t1_values']
-loss_values = res['loss_values']
-
-# If you want the final minimum point
-min_t0 = res['final_t0']
-min_t1 = res['final_t1']
-t0_grid = np.linspace(min(t0_values) - 1, max(t0_values) + 1, 100)
-t1_grid = np.linspace(min(t1_values) - 1, max(t1_values) + 1, 100)
-T0, T1 = np.meshgrid(t0_grid, t1_grid)
-
-# Calculate the loss function at each point of the grid
-loss_grid = np.zeros_like(T0)
-for i in range(len(t0_grid)):
-    for j in range(len(t1_grid)):
-        loss_grid[i, j] = np.mean((y - (T0[i, j] + T1[i, j] * x1)) ** 2)
-
-# Plotting the contour map
-plt.contourf(T0, T1, loss_grid, levels=50, cmap='viridis')
-plt.colorbar(label='Loss')
-
-# Plot the trajectory of t0 and t1 during the 2500 epochs
-plt.plot(t0_values, t1_values, marker='o', color='red', label='Trajectory')
-plt.scatter(t0_values, t1_values, c='red')
-plt.xlabel("t0")
-plt.ylabel("t1")
-plt.title("Contour Plot of Loss Function over 50 Epochs")
-plt.legend()
-
-# Mark the starting point and the minima point
-plt.scatter(t0_values[0], t1_values[0], c='blue', s=100, label='Start Point')  # Start
-plt.scatter(min_t0, min_t1, c='yellow', s=100, label='Minima')  # Minima
-
-plt.legend()
-plt.show()
-
-# Create a folder to store frames temporarily
-frames_folder = "trajectory_frames"
-if not os.path.exists(frames_folder):
-    os.makedirs(frames_folder)
-
-filenames = []
-
-# Plot the trajectory of t0 and t1 during the first 15 epochs
-for i in range(15):
-    plt.contourf(T0, T1, loss_grid, levels=50, cmap='viridis')
-    plt.colorbar(label='Loss')
-    
-    # Plot trajectory
-    plt.plot(t0_values[0:i+1], t1_values[0:i+1], marker='o', color='red', label='Trajectory')
-    plt.scatter(t0_values[0:i+1], t1_values[0:i+1], c='red')
-    
-    plt.xlabel("t0")
-    plt.ylabel("t1")
-    plt.title(f"Contour Plot of Loss Function over {i+1} Epochs")
-    
-    # Mark the starting point and the ending point (minimized point)
-    plt.scatter(t0_values[0], t1_values[0], c='blue', s=100, label='Start Point')  # Start
-    plt.scatter(t0_values[-1], t1_values[-1], c='yellow', s=100, label='Minima')  # Minima
-
-    plt.legend()
-    
-    # Save the frame
-    filename = os.path.join(frames_folder, f"frame_{i:03d}.png")
-    plt.savefig(filename)
-    filenames.append(filename)
-    
-    plt.close()
-
-# Create a folder to store the final GIF permanently
-results_folder = "results"
-if not os.path.exists(results_folder):
-    os.makedirs(results_folder)
-
-gif_filename = os.path.join(results_folder, "trajectory_sgd_no_momentum.gif")
-
-# Create the GIF
-with imageio.get_writer(gif_filename, mode='I', duration=0.5, loop=0) as writer:
-    for filename in filenames:
-        image = imageio.imread(filename)
-        writer.append_data(image)
-
-# Cleanup temporary frames
-try:
-    for filename in filenames:
-        os.remove(filename)
-    shutil.rmtree(frames_folder, ignore_errors=True)
-    print(f"GIF saved permanently at: {gif_filename}")
-except Exception as e:
-    print(f"Cleanup failed: {e}")
-
-```
 
 
     
@@ -482,27 +107,6 @@ except Exception as e:
 ### Average Convergence Steps for Stochastic Gradient Descent
 
 
-```python
-def average_convergence_sgd(x, y, start_points, alpha=0.01, epochs=50, epsilon=1e-3, min_loss=None):
-    total_steps = 0
-    valid_runs = 0
-
-    for start_theta in start_points:
-        result = stochastic_gd(x, y, alpha, epochs, epsilon, start_theta, min_loss)
-        if result["converge_epoch"] is not None:
-            total_steps += num_samples*result["converge_epoch"]
-            valid_runs += 1
-
-    avg_steps = total_steps / valid_runs if valid_runs > 0 else None
-    print(f" Average convergence steps across {valid_runs} runs: {avg_steps}")
-    return avg_steps
-```
-
-
-```python
-start_thetas = [(np.random.uniform(-5, 5), np.random.uniform(-5, 5)) for _ in range(5)]
-average_convergence_sgd(x_tensor, y_tensor, start_thetas, alpha=0.01, epochs=50, epsilon=0.001, min_loss=min_loss)
-```
 
      Average convergence steps across 5 runs: 688.0
     
@@ -510,105 +114,18 @@ average_convergence_sgd(x_tensor, y_tensor, start_thetas, alpha=0.01, epochs=50,
 
 
 
-    688.0
+
 
 
 
 ### Gradient Descent with momentum
 
 
-```python
-def full_batch_gd_momentum(x, y, alpha=0.01, momentum=0.9, epochs=100, epsilon=1e-3, start_theta=(1.0, 1.0), min_loss=None):
-    """
-    Performs Full Batch Gradient Descent with Momentum on y = t0 + t1*x
-    Returns trajectory, loss dict, convergence info
-    """
-    num_samples = len(x)
-    
-    # Initialize parameters
-    t0 = torch.tensor(start_theta[0], requires_grad=True)
-    t1 = torch.tensor(start_theta[1], requires_grad=True)
-    
-    # Initialize momentum velocities
-    v_t0 = torch.tensor(0.0)
-    v_t1 = torch.tensor(0.0)
-    
-    # Lists to store trajectory
-    t0_values, t1_values, loss_values = [], [], []
-    t0_grad, t1_grad = [], []
-    velocity_t0, velocity_t1 = [], []
-    loss_dict = {}
-    
-    for epoch in range(1, epochs + 1):
-        # Compute full batch loss
-        yp = t0 + t1 * x
-        loss = torch.mean((y - yp) ** 2)
-        loss.backward()
-        
-        # Store gradients and velocities
-        with torch.no_grad():
-            # Update velocities
-            v_t0 = momentum * v_t0 + alpha * t0.grad
-            v_t1 = momentum * v_t1 + alpha * t1.grad
-            
-            # Update parameters
-            t0 -= v_t0
-            t1 -= v_t1
-            
-            t0_grad.append(t0.grad.item())
-            t1_grad.append(t1.grad.item())
-            velocity_t0.append(v_t0.item())
-            velocity_t1.append(v_t1.item())
-        
-        # Store trajectory and loss
-        t0_values.append(t0.item())
-        t1_values.append(t1.item())
-        loss_values.append(loss.item())
-        loss_dict[epoch] = loss.item()
-        
-        # Reset gradients
-        t0.grad.zero_()
-        t1.grad.zero_()
-    
-    # Convergence detection
-    converge_epoch, converge_loss = None, None
-    if min_loss is not None:
-        for epoch in loss_dict.keys():
-            if abs(loss_dict[epoch] - min_loss) <= epsilon:
-                converge_epoch = epoch
-                converge_loss = loss_dict[epoch]
-                break
-    
-    return {
-        "t0_values": t0_values,
-        "t1_values": t1_values,
-        "loss_values": loss_values,
-        "loss_dict": loss_dict,
-        "t0_grad": t0_grad,
-        "t1_grad": t1_grad,
-        "velocity_t0": velocity_t0,
-        "velocity_t1": velocity_t1,
-        "final_t0": t0.item(),
-        "final_t1": t1.item(),
-        "converge_epoch": converge_epoch,
-        "converge_loss": converge_loss,
-    }
-
-```
 
 ### Plot of Loss Vs Epochs for Full Batch Gradient Descent with momentum=0.9
 
 
-```python
-res = full_batch_gd_momentum(
-    x_tensor, y_tensor,
-    alpha=0.01,momentum=0.9, epochs=15, epsilon=0.001,
-    start_theta=(1.0, 1.0), min_loss=min_loss
-)
 
-# Plot results
-plot_loss_vs_epoch(res["loss_dict"], res["converge_epoch"], res["converge_loss"])
-```
 
 
     
@@ -617,20 +134,7 @@ plot_loss_vs_epoch(res["loss_dict"], res["converge_epoch"], res["converge_loss"]
 
 
 
-```python
-res = full_batch_gd_momentum(
-    x_tensor, y_tensor,
-    alpha=0.01,momentum=0.9, epochs=100, epsilon=0.001,
-    start_theta=(1.0, 1.0), min_loss=min_loss
-)
-print(res["converge_epoch"])
-print(res["converge_loss"])
-# Plot results
-plot_loss_vs_epoch(res["loss_dict"], res["converge_epoch"], res["converge_loss"])
-```
 
-    38
-    0.5958859507986828
     
 
 
@@ -642,103 +146,7 @@ plot_loss_vs_epoch(res["loss_dict"], res["converge_epoch"], res["converge_loss"]
 ### Contour Plot for Full Batch Gradient Descent with momentum = 0.9
 
 
-```python
-t0_values = res['t0_values']
-t1_values = res['t1_values']
-loss_values = res['loss_values']
 
-# If you want the final minimum point
-min_t0 = res['final_t0']
-min_t1 = res['final_t1']
-t0_grid = np.linspace(min(t0_values) - 1, max(t0_values) + 1, 100)
-t1_grid = np.linspace(min(t1_values) - 1, max(t1_values) + 1, 100)
-T0, T1 = np.meshgrid(t0_grid, t1_grid)
-
-# Calculate the loss function at each point of the grid
-loss_grid = np.zeros_like(T0)
-for i in range(len(t0_grid)):
-    for j in range(len(t1_grid)):
-        loss_grid[i, j] = np.mean((y - (T0[i, j] + T1[i, j] * x1)) ** 2)
-
-# Plotting the contour map
-plt.contourf(T0, T1, loss_grid, levels=50, cmap='viridis')
-plt.colorbar(label='Loss')
-
-# Plot the trajectory of t0 and t1 during the 2500 epochs
-plt.plot(t0_values, t1_values, marker='o', color='red', label='Trajectory')
-plt.scatter(t0_values, t1_values, c='red')
-plt.xlabel("t0")
-plt.ylabel("t1")
-plt.title("Contour Plot visualization of Loss Function over 50 Epochs")
-plt.legend()
-
-# Mark the starting point and the minima point
-plt.scatter(t0_values[0], t1_values[0], c='blue', s=100, label='Start Point')  # Start
-plt.scatter(min_t0, min_t1, c='yellow', s=100, label='Minima')  # Minima
-
-plt.legend()
-plt.show()
-
-
-
-# Create a folder to store frames temporarily
-frames_folder = "trajectory_frames"
-if not os.path.exists(frames_folder):
-    os.makedirs(frames_folder)
-
-filenames = []
-
-# Plot the trajectory of t0 and t1 during the first 15 epochs
-for i in range(15):
-    plt.contourf(T0, T1, loss_grid, levels=50, cmap='viridis')
-    plt.colorbar(label='Loss')
-    
-    # Plot trajectory
-    plt.plot(t0_values[0:i+1], t1_values[0:i+1], marker='o', color='red', label='Trajectory')
-    plt.scatter(t0_values[0:i+1], t1_values[0:i+1], c='red')
-    
-    plt.xlabel("t0")
-    plt.ylabel("t1")
-    plt.title(f"Contour Plot of Loss Function over {i+1} Epochs")
-    
-    # Mark the starting point and the ending point (minimized point)
-    plt.scatter(t0_values[0], t1_values[0], c='blue', s=100, label='Start Point')  # Start
-    plt.scatter(t0_values[-1], t1_values[-1], c='yellow', s=100, label='Minima')  # Minima
-
-    plt.legend()
-    
-    # Save the frame
-    filename = os.path.join(frames_folder, f"frame_{i:03d}.png")
-    plt.savefig(filename)
-    filenames.append(filename)
-    
-    plt.close()
-
-# Create a folder to store the final GIF permanently
-results_folder = "results"
-if not os.path.exists(results_folder):
-    os.makedirs(results_folder)
-
-gif_filename = os.path.join(results_folder, "trajectory_bgd_momentum.gif")
-
-# Create the GIF
-with imageio.get_writer(gif_filename, mode='I', duration=0.5, loop=0) as writer:
-    for filename in filenames:
-        image = imageio.imread(filename)
-        writer.append_data(image)
-
-# Cleanup temporary frames
-
-try:
-    for filename in filenames:
-        os.remove(filename)
-    shutil.rmtree(frames_folder, ignore_errors=True)
-    print(f"GIF saved permanently at: {gif_filename}")
-except Exception as e:
-    print(f"Cleanup failed: {e}")
-
-
-```
 
 
     
@@ -754,43 +162,11 @@ except Exception as e:
     
 
 
-```python
 
-# res_momentum is the dictionary returned by your momentum GD function
-df = pd.DataFrame({
-    "epoch": list(res["loss_dict"].keys()),
-    "t0": res["t0_values"],
-    "t1": res["t1_values"],
-    "t0_grad": res["t0_grad"],
-    "t1_grad": res["t1_grad"],
-    "velocity_t0": res["velocity_t0"],
-    "velocity_t1": res["velocity_t1"],
-    "loss": res["loss_values"]
-})
-
-# Add an iteration column if you want 1-to-1 with rows
-df["iteration"] = range(1, len(df) + 1)
-df.set_index("iteration", inplace=True)
-
-display(df)
-
-```
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -947,28 +323,7 @@ display(df)
 ### Average Convergence Steps for Full Batch Gradient Descent with momentum= 0.9
 
 
-```python
-def average_convergence_mom(x, y, start_points, alpha=0.01, momentum=0.9, epochs=1000, epsilon=1e-3, min_loss=None):
-    total_epochs = 0
-    valid_runs = 0
 
-    for start_theta in start_points:
-        result = full_batch_gd_momentum(x, y, 0.01, 0.9, 100, 0.001, start_theta, min_loss)
-
-        if result["converge_epoch"] is not None:
-            total_epochs += result["converge_epoch"]
-            valid_runs += 1
-
-    avg_steps = total_epochs / valid_runs if valid_runs > 0 else None
-    print(f" Average convergence steps across {valid_runs} runs: {avg_steps}")
-    return avg_steps
-```
-
-
-```python
-start_thetas = [(np.random.uniform(-5, 5), np.random.uniform(-5, 5)) for _ in range(5)]
-average_convergence_mom(x_tensor, y_tensor, start_thetas, momentum=0.9, alpha=0.01, epochs=100, epsilon=0.001, min_loss=min_loss)
-```
 
      Average convergence steps across 5 runs: 37.6
     
@@ -976,123 +331,14 @@ average_convergence_mom(x_tensor, y_tensor, start_thetas, momentum=0.9, alpha=0.
 
 
 
-    37.6
+    
 
 
 
 ### Stochastic Gradient Descent with momentum=0.9
 
 
-```python
-def stochastic_gd_momentum(x, y, alpha=0.005, momentum=0.7, epochs=50, epsilon=1e-3, start_theta=(1.0, 1.0), min_loss=None):
-    """
-    Performs Stochastic Gradient Descent (SGD) with Momentum on y = t0 + t1*x
-    Returns trajectory, loss dict, gradients, velocities, and convergence info
-    """
-    num_samples = len(x)
-    
-    # Initialize parameters
-    t0 = torch.tensor(start_theta[0], requires_grad=True)
-    t1 = torch.tensor(start_theta[1], requires_grad=True)
-    
-    # Initialize velocities
-    v_t0 = 0.0
-    v_t1 = 0.0
-    
-    # Lists to store trajectory and other info
-    t0_values, t1_values, loss_values = [], [], []
-    dt0_values, dt1_values = [], []
-    t0_grad, t1_grad = [], []
-    velocity_t0, velocity_t1 = [], []
-    epoch_values = []
-    loss_dict = {}
-    
-    for epoch in range(epochs):
-        for i in range(num_samples):
-            # Compute per-sample loss
-            yp = t0 + t1 * x[i]
-            loss = (y[i] - yp) ** 2
-            loss.backward()
-            
-            # Update parameters with momentum
-            with torch.no_grad():
-                v_t0 = momentum * v_t0 + alpha * t0.grad
-                v_t1 = momentum * v_t1 + alpha * t1.grad
-                
-                t0 -= v_t0
-                t1 -= v_t1
-                
-                # Store gradients and velocities
-                t0_grad.append(t0.grad.item())
-                t1_grad.append(t1.grad.item())
-                velocity_t0.append(v_t0.item())
-                velocity_t1.append(v_t1.item())
-                
-                dt0_values.append(t0.item())
-                dt1_values.append(t1.item())
-                
-                # Epoch tracking
-                if i < num_samples - 1:
-                    epoch_values.append(epoch)
-                else:
-                    epoch_values.append(epoch + 1)
-                
-                # Zero gradients for next iteration
-                t0.grad.zero_()
-                t1.grad.zero_()
-        
-        # Full dataset loss after each epoch
-        yp_full = t0 + t1 * x
-        full_loss = torch.mean((y - yp_full) ** 2)
-        loss_dict[epoch] = full_loss.item()
-        
-        # Store trajectory for contour plotting
-        t0_values.append(t0.item())
-        t1_values.append(t1.item())
-        loss_values.append(full_loss.item())
-    
-    # Convergence detection
-    converge_epoch, converge_loss = None, None
-    if min_loss is not None:
-        for epoch_key in loss_dict.keys():
-            if abs(loss_dict[epoch_key] - min_loss) <= epsilon:
-                converge_epoch = epoch_key
-                converge_loss = loss_dict[epoch_key]
-                break
-    
-    return {
-        "t0_values": t0_values,
-        "t1_values": t1_values,
-        "loss_values": loss_values,
-        "loss_dict": loss_dict,
-        "dt0_values": dt0_values,
-        "dt1_values": dt1_values,
-        "t0_grad": t0_grad,
-        "t1_grad": t1_grad,
-        "velocity_t0": velocity_t0,
-        "velocity_t1": velocity_t1,
-        "epoch_values": epoch_values,
-        "final_t0": t0.item(),
-        "final_t1": t1.item(),
-        "converge_epoch": converge_epoch,
-        "converge_loss": converge_loss
-    }
 
-```
-
-
-```python
-res = stochastic_gd_momentum(
-    x_tensor, y_tensor,
-    alpha=0.01,momentum=0.9, epochs=100000, epsilon=0.001,
-    start_theta=(1.0, 1.0), min_loss=min_loss
-)
-print(res["converge_epoch"], res["converge_loss"])
-# Plot results
-plot_loss_vs_epoch(res["loss_dict"], res["converge_epoch"], res["converge_loss"])
-```
-
-    None None
     
 
 
@@ -1102,101 +348,6 @@ plot_loss_vs_epoch(res["loss_dict"], res["converge_epoch"], res["converge_loss"]
 
 
 
-```python
-t0_values = res['t0_values']
-t1_values = res['t1_values']
-loss_values = res['loss_values']
-
-# If you want the final minimum point
-min_t0 = res['final_t0']
-min_t1 = res['final_t1']
-t0_grid = np.linspace(min(t0_values) - 1, max(t0_values) + 1, 100)
-t1_grid = np.linspace(min(t1_values) - 1, max(t1_values) + 1, 100)
-T0, T1 = np.meshgrid(t0_grid, t1_grid)
-
-# Calculate the loss function at each point of the grid
-loss_grid = np.zeros_like(T0)
-for i in range(len(t0_grid)):
-    for j in range(len(t1_grid)):
-        loss_grid[i, j] = np.mean((y - (T0[i, j] + T1[i, j] * x1)) ** 2)
-
-# Plotting the contour map
-plt.contourf(T0, T1, loss_grid, levels=50, cmap='viridis')
-plt.colorbar(label='Loss')
-
-# Plot the trajectory of t0 and t1 during the 2500 epochs
-plt.plot(t0_values, t1_values, marker='o', color='red', label='Trajectory')
-plt.scatter(t0_values, t1_values, c='red')
-plt.xlabel("t0")
-plt.ylabel("t1")
-plt.title("Contour Plot visualization of Loss Function over 15 Epochs")
-plt.legend()
-
-# Mark the starting point and the minima point
-plt.scatter(t0_values[0], t1_values[0], c='blue', s=100, label='Start Point')  # Start
-#plt.scatter(min_t0, min_t1, c='yellow', s=100, label='Minima')  # Minima
-
-plt.legend()
-plt.show()
-
-
-
-# Create a folder to store frames temporarily
-frames_folder = "trajectory_frames"
-if not os.path.exists(frames_folder):
-    os.makedirs(frames_folder)
-
-filenames = []
-
-# Plot the trajectory of t0 and t1 during the first 15 epochs
-for i in range(15):
-    plt.contourf(T0, T1, loss_grid, levels=50, cmap='viridis')
-    plt.colorbar(label='Loss')
-    
-    # Plot trajectory
-    plt.plot(t0_values[0:i+1], t1_values[0:i+1], marker='o', color='red', label='Trajectory')
-    plt.scatter(t0_values[0:i+1], t1_values[0:i+1], c='red')
-    
-    plt.xlabel("t0")
-    plt.ylabel("t1")
-    plt.title(f"Contour Plot of Loss Function over {i+1} Epochs")
-    
-    # Mark the starting point and the ending point (minimized point)
-    plt.scatter(t0_values[0], t1_values[0], c='blue', s=100, label='Start Point')  # Start
-    #plt.scatter(t0_values[-1], t1_values[-1], c='yellow', s=100, label='Minima')  # Minima
-
-    plt.legend()
-    
-    # Save the frame
-    filename = os.path.join(frames_folder, f"frame_{i:03d}.png")
-    plt.savefig(filename)
-    filenames.append(filename)
-    
-    plt.close()
-
-# Create a folder to store the final GIF permanently
-results_folder = "results"
-if not os.path.exists(results_folder):
-    os.makedirs(results_folder)
-
-gif_filename = os.path.join(results_folder, "trajectory_sgd_momentum_alpha_0.01.gif")
-
-# Create the GIF
-with imageio.get_writer(gif_filename, mode='I', duration=0.5, loop=0) as writer:
-    for filename in filenames:
-        image = imageio.imread(filename)
-        writer.append_data(image)
-
-# Cleanup temporary frames
-try:
-    for filename in filenames:
-        os.remove(filename)
-    shutil.rmtree(frames_folder, ignore_errors=True)
-    print(f"GIF saved permanently at: {gif_filename}")
-except Exception as e:
-    print(f"Cleanup failed: {e}")
-
-```
 
 
     
@@ -1217,18 +368,6 @@ We observe that stochastic gradient descent with momentum (momentum = 0.9) and a
 ### Plot of Loss vs Epochs for Stochastic Gradient Descent with momentum = 0.9
 
 
-```python
-res = stochastic_gd_momentum(
-    x_tensor, y_tensor,
-    alpha=0.001,momentum=0.9, epochs=15, epsilon=0.001,
-    start_theta=(1.0, 1.0), min_loss=min_loss
-)
-print(res["converge_epoch"], res["converge_loss"])
-# Plot results
-plot_loss_vs_epoch(res["loss_dict"], res["converge_epoch"], res["converge_loss"])
-```
-
-    13 0.5965090834935887
     
 
 
@@ -1240,101 +379,6 @@ plot_loss_vs_epoch(res["loss_dict"], res["converge_epoch"], res["converge_loss"]
 ### Contour Plot for Stochastic Gradient Descent with momentum = 0.9
 
 
-```python
-t0_values = res['t0_values']
-t1_values = res['t1_values']
-loss_values = res['loss_values']
-
-# If you want the final minimum point
-min_t0 = res['final_t0']
-min_t1 = res['final_t1']
-t0_grid = np.linspace(min(t0_values) - 1, max(t0_values) + 1, 100)
-t1_grid = np.linspace(min(t1_values) - 1, max(t1_values) + 1, 100)
-T0, T1 = np.meshgrid(t0_grid, t1_grid)
-
-# Calculate the loss function at each point of the grid
-loss_grid = np.zeros_like(T0)
-for i in range(len(t0_grid)):
-    for j in range(len(t1_grid)):
-        loss_grid[i, j] = np.mean((y - (T0[i, j] + T1[i, j] * x1)) ** 2)
-
-# Plotting the contour map
-plt.contourf(T0, T1, loss_grid, levels=50, cmap='viridis')
-plt.colorbar(label='Loss')
-
-# Plot the trajectory of t0 and t1 during the 2500 epochs
-plt.plot(t0_values, t1_values, marker='o', color='red', label='Trajectory')
-plt.scatter(t0_values, t1_values, c='red')
-plt.xlabel("t0")
-plt.ylabel("t1")
-plt.title("Contour Plot visualization of Loss Function over 15 Epochs")
-plt.legend()
-
-# Mark the starting point and the minima point
-plt.scatter(t0_values[0], t1_values[0], c='blue', s=100, label='Start Point')  # Start
-plt.scatter(min_t0, min_t1, c='yellow', s=100, label='Minima')  # Minima
-
-plt.legend()
-plt.show()
-
-
-
-# Create a folder to store frames temporarily
-frames_folder = "trajectory_frames"
-if not os.path.exists(frames_folder):
-    os.makedirs(frames_folder)
-
-filenames = []
-
-# Plot the trajectory of t0 and t1 during the first 15 epochs
-for i in range(15):
-    plt.contourf(T0, T1, loss_grid, levels=50, cmap='viridis')
-    plt.colorbar(label='Loss')
-    
-    # Plot trajectory
-    plt.plot(t0_values[0:i+1], t1_values[0:i+1], marker='o', color='red', label='Trajectory')
-    plt.scatter(t0_values[0:i+1], t1_values[0:i+1], c='red')
-    
-    plt.xlabel("t0")
-    plt.ylabel("t1")
-    plt.title(f"Contour Plot of Loss Function over {i+1} Epochs")
-    
-    # Mark the starting point and the ending point (minimized point)
-    plt.scatter(t0_values[0], t1_values[0], c='blue', s=100, label='Start Point')  # Start
-    plt.scatter(t0_values[-1], t1_values[-1], c='yellow', s=100, label='Minima')  # Minima
-
-    plt.legend()
-    
-    # Save the frame
-    filename = os.path.join(frames_folder, f"frame_{i:03d}.png")
-    plt.savefig(filename)
-    filenames.append(filename)
-    
-    plt.close()
-
-# Create a folder to store the final GIF permanently
-results_folder = "results"
-if not os.path.exists(results_folder):
-    os.makedirs(results_folder)
-
-gif_filename = os.path.join(results_folder, "trajectory_sgd_momentum_alpha_0.001.gif")
-
-# Create the GIF
-with imageio.get_writer(gif_filename, mode='I', duration=0.5, loop=0) as writer:
-    for filename in filenames:
-        image = imageio.imread(filename)
-        writer.append_data(image)
-
-# Cleanup temporary frames
-try:
-    for filename in filenames:
-        os.remove(filename)
-    shutil.rmtree(frames_folder, ignore_errors=True)
-    print(f"GIF saved permanently at: {gif_filename}")
-except Exception as e:
-    print(f"Cleanup failed: {e}")
-
-```
 
 
     
@@ -1352,54 +396,11 @@ except Exception as e:
 ### Average Convergence Steps for Stochastic Gradient Descent with momentum =0.9
 
 
-```python
-def average_convergence_sgd_momentum(x, y, start_points, alpha=0.005, momentum=0.7,epochs=50, epsilon=1e-3, min_loss=None):
-    total_steps = 0
-    valid_runs = 0
-
-    for start_theta in start_points:
-        result = stochastic_gd_momentum(x, y, 0.005, 0.7, 50, 0.001, start_theta, min_loss)
-        if result["converge_epoch"] is not None:
-            total_steps += num_samples*result["converge_epoch"]
-            valid_runs += 1
-
-    avg_steps = total_steps / valid_runs if valid_runs > 0 else None
-    print(f"Average convergence steps across {valid_runs} runs: {avg_steps}")
-    return avg_steps
-```
-
-
-```python
-start_thetas = [(np.random.uniform(-5, 5), np.random.uniform(-5, 5)) for _ in range(5)]
-average_convergence_sgd_momentum(x_tensor, y_tensor, start_thetas, momentum=0.7, alpha=0.005, epochs=100, epsilon=0.001, min_loss=min_loss)
-```
 
     Average convergence steps across 5 runs: 328.0
     
 
 
-
-
-    328.0
-
-
-
-
-```python
-df_iter = pd.DataFrame({
-    "t0": res["dt0_values"],
-    "t1": res["dt1_values"],
-    "t0_grad": res["t0_grad"],
-    "t1_grad": res["t1_grad"],
-    "velocity_t0": res["velocity_t0"],
-    "velocity_t1": res["velocity_t1"],
-    "epoch": res["epoch_values"]
-})
-df_iter["iteration"] = range(1, len(df_iter) + 1)
-df_iter.set_index("iteration", inplace=True)
-display(df_iter)
-
-```
 
 
 <div>
