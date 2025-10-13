@@ -31,9 +31,9 @@ Plot the loss curve during training.
 Report accuracy on the dataset for both models.
 
 
-![loss Curve](https://github.com/AnujaChaudhari17/ML_Assignment2/blob/main/image1_task5.png?raw=true)
-![alt text](image2_task5.png)
-![alt text](image3_task5.png)
+![Loss Curve](https://github.com/AnujaChaudhari17/ML_Assignment2/blob/main/image1_task5.png?raw=true)
+![alt text](./image2_task5.png)
+![alt text](./image3_task5.png)
 
 Observations:
 
@@ -43,5 +43,6 @@ The training loss curve shows a successful convergence, dropping steeply at firs
 
 
 The decision boundaries from both models are visually indistinguishable, proving that our model learned the same linear separation as the scikit-learn standard.
+
 
 
