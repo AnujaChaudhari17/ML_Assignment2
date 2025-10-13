@@ -2,7 +2,7 @@
 
 Implement logistic regression from scratch in PyTorch with an interface similar to scikit-learn's `LogisticRegression`. Your implementation should support the following:
 
-```python
+
 class LogisticTorch:
     def __init__(self, lr=0.01, epochs=1000):
         pass
@@ -43,6 +43,7 @@ The training loss curve shows a successful convergence, dropping steeply at firs
 
 
 The decision boundaries from both models are visually indistinguishable, proving that our model learned the same linear separation as the scikit-learn standard.
+
 
 
 
