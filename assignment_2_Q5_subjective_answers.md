@@ -31,14 +31,15 @@ Plot the loss curve during training.
 Report accuracy on the dataset for both models.
 
 
-![alt text](image-2.png)
-![alt text](image-3.png)
-![alt text](image-4.png)
+![alt text](image1_task5.png)
+![alt text](image2_task5.png)
+![alt text](image3_task5.png)
 
 Observations:
 
 Our PyTorch model's accuracy (83.5%) is nearly identical to scikit-learn's (85.0%), which validates our from-scratch implementation.
 
 The training loss curve shows a successful convergence, dropping steeply at first and then flattening out as the model finished learning.
+
 
 The decision boundaries from both models are visually indistinguishable, proving that our model learned the same linear separation as the scikit-learn standard.
