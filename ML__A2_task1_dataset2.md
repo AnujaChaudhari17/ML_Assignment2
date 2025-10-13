@@ -1,52 +1,13 @@
 ### Task 1: Dataset 2
 
 
-```python
-import numpy as np
-import torch.autograd
-import matplotlib.pyplot as plt
-import pandas as pd
-import imageio
-import os
-from IPython.display import Image, display
-```
 
 
-```python
-np.random.seed(45)
-num_samples = 40
-    
-# Generate data
-x1 = np.random.uniform(-1, 1, num_samples)
-f_x = 3*x1 + 4
-eps = np.random.randn(num_samples)
-y = f_x + eps
-```
 
 
-```python
-from numpy.linalg import inv
 
-x0=np.ones(num_samples)
-X=np.hstack((x0.reshape(num_samples,1),x1.reshape(num_samples,1)))
-print(X.shape)
 
-T=inv(X.T@X)@X.T@y
 
-print("Theta matrix: ",end="")
-print(T)
-
-min_t0=T[0]
-min_t1=T[1]
-
-min_loss=0
-for i in range(num_samples):
-    yp= min_t0 + min_t1*x1[i]
-    min_loss += (y[i]-yp)**2
-min_loss=min_loss/num_samples
-
-print(f"Min Loss: {min_loss}")
-```
 
     (40, 2)
     Theta matrix: [3.9507064  2.68246893]
