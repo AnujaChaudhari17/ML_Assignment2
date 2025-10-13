@@ -3,7 +3,7 @@
 * [2 marks] Consider the [Daily Temperatures dataset](https://raw.githubusercontent.com/jbrownlee/Datasets/master/daily-temperatures.csv) from Australia. This is a dataset for a forecasting task. That is, given temperatures up to date (or period) T, design a forecasting (autoregressive) model to predict the temperature on date T+1. You can refer to [link 1](https://en.wikipedia.org/wiki/Autoregressive_model), [link 2](https://machinelearningmastery.com/autoregression-models-time-series-forecasting-python/) for more information on autoregressive models. Use linear regression as your autoregressive model. Plot the fit of your predictions vs the true values and report the RMSE obtained. A demonstration of the plot is given below.
 
 ---
-![Autoregression Plot](Screenshot 2025-10-13 224318.png)
+![!Autoregression Plot](Screenshot 2025-10-13 224318.png)
 
 
 ### Observations
@@ -14,3 +14,4 @@
 
 
 * **Smoothing of Extremes:** The model tends to smooth out the data, rarely predicting the most extreme temperature highs and lows. It captures the overall trend but is less sensitive to sharp, infrequent spikes.
+
