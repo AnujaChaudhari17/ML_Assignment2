@@ -1,13 +1,13 @@
-# Task-4b Data Compression using Matrix Factorization
+# Task-4B Data Compression using Matrix Factorization
 
-Consider an image patch of size (50x50) that you want to compress using matrix factorization. To do this, you'll split the patch [N×N] into two smaller matrices of size [N×r] and [r×N] using matrix factorization. Compute the compressed patch by multiplying these two matrices and compare the reconstructed image patch with the original patch. Compute the Root Mean Squared Error (RMSE) and Peak Signal-to-Noise Ratio (PSNR) between the original and reconstructed image patches.
+Consider an image patch of size (50x50) that you want to compress using matrix factorization. To do this, you'll split the patch [N×N] into two smaller matrices of size [N×r] and [r×N] using matrix factorization. Compute the compressed patch by multiplying these two matrices and compare the reconstructed image patch with the original patch. 
 Consider the following three cases-
 
 - a patch with mainly a single color.
 - a patch with 2-3 different colors.
 - a patch with at least 5 different colors.
 
-Test different values for the low-rank r=[5,10,25,50].Use Gradient Descent to learn the compressed matrices.Display the reconstructed image patches, keeping the original pixel values outside the patch unchanged, and use your compressed matrix for the patch to show how well the reconstruction works.
+Test different values for the low-rank r=[5,10,25,50]. Use Gradient Descent to learn the compressed matrices. Display the reconstructed image patches, keeping the original pixel values outside the patch unchanged, and use your compressed matrix for the patch to show how well the reconstruction works.
 
 
 ### Importing Required Libraries
@@ -18,7 +18,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
 from sklearn import preprocessing
 import warnings
 warnings.filterwarnings('ignore')
@@ -61,9 +60,7 @@ set_seed(42)
 ```python
 # Load and preprocess image
 img = torchvision.io.read_image("./Multi_Color_Photo.jpg")
-# img = torchvision.io.read_image("./dog.jpg")
 img = img.to(dtype=torch.float32)  # Ensure tensor is of type float
-
 ```
 
 ### Scaling the image
@@ -77,7 +74,7 @@ scaler
 
 
 
-<style>#sk-container-id-9 {
+<style>#sk-container-id-4 {
   /* Definition of color scheme common for light and dark mode */
   --sklearn-color-text: #000;
   --sklearn-color-text-muted: #666;
@@ -108,15 +105,15 @@ scaler
   }
 }
 
-#sk-container-id-9 {
+#sk-container-id-4 {
   color: var(--sklearn-color-text);
 }
 
-#sk-container-id-9 pre {
+#sk-container-id-4 pre {
   padding: 0;
 }
 
-#sk-container-id-9 input.sk-hidden--visually {
+#sk-container-id-4 input.sk-hidden--visually {
   border: 0;
   clip: rect(1px 1px 1px 1px);
   clip: rect(1px, 1px, 1px, 1px);
@@ -128,7 +125,7 @@ scaler
   width: 1px;
 }
 
-#sk-container-id-9 div.sk-dashed-wrapped {
+#sk-container-id-4 div.sk-dashed-wrapped {
   border: 1px dashed var(--sklearn-color-line);
   margin: 0 0.4em 0.5em 0.4em;
   box-sizing: border-box;
@@ -136,7 +133,7 @@ scaler
   background-color: var(--sklearn-color-background);
 }
 
-#sk-container-id-9 div.sk-container {
+#sk-container-id-4 div.sk-container {
   /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
      but bootstrap.min.css set `[hidden] { display: none !important; }`
      so we also need the `!important` here to be able to override the
@@ -146,7 +143,7 @@ scaler
   position: relative;
 }
 
-#sk-container-id-9 div.sk-text-repr-fallback {
+#sk-container-id-4 div.sk-text-repr-fallback {
   display: none;
 }
 
@@ -162,14 +159,14 @@ div.sk-item {
 
 /* Parallel-specific style estimator block */
 
-#sk-container-id-9 div.sk-parallel-item::after {
+#sk-container-id-4 div.sk-parallel-item::after {
   content: "";
   width: 100%;
   border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
   flex-grow: 1;
 }
 
-#sk-container-id-9 div.sk-parallel {
+#sk-container-id-4 div.sk-parallel {
   display: flex;
   align-items: stretch;
   justify-content: center;
@@ -177,28 +174,28 @@ div.sk-item {
   position: relative;
 }
 
-#sk-container-id-9 div.sk-parallel-item {
+#sk-container-id-4 div.sk-parallel-item {
   display: flex;
   flex-direction: column;
 }
 
-#sk-container-id-9 div.sk-parallel-item:first-child::after {
+#sk-container-id-4 div.sk-parallel-item:first-child::after {
   align-self: flex-end;
   width: 50%;
 }
 
-#sk-container-id-9 div.sk-parallel-item:last-child::after {
+#sk-container-id-4 div.sk-parallel-item:last-child::after {
   align-self: flex-start;
   width: 50%;
 }
 
-#sk-container-id-9 div.sk-parallel-item:only-child::after {
+#sk-container-id-4 div.sk-parallel-item:only-child::after {
   width: 0;
 }
 
 /* Serial-specific style estimator block */
 
-#sk-container-id-9 div.sk-serial {
+#sk-container-id-4 div.sk-serial {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -216,14 +213,14 @@ clickable and can be expanded/collapsed.
 
 /* Pipeline and ColumnTransformer style (default) */
 
-#sk-container-id-9 div.sk-toggleable {
+#sk-container-id-4 div.sk-toggleable {
   /* Default theme specific background. It is overwritten whether we have a
   specific estimator or a Pipeline/ColumnTransformer */
   background-color: var(--sklearn-color-background);
 }
 
 /* Toggleable label */
-#sk-container-id-9 label.sk-toggleable__label {
+#sk-container-id-4 label.sk-toggleable__label {
   cursor: pointer;
   display: flex;
   width: 100%;
@@ -236,13 +233,13 @@ clickable and can be expanded/collapsed.
   gap: 0.5em;
 }
 
-#sk-container-id-9 label.sk-toggleable__label .caption {
+#sk-container-id-4 label.sk-toggleable__label .caption {
   font-size: 0.6rem;
   font-weight: lighter;
   color: var(--sklearn-color-text-muted);
 }
 
-#sk-container-id-9 label.sk-toggleable__label-arrow:before {
+#sk-container-id-4 label.sk-toggleable__label-arrow:before {
   /* Arrow on the left of the label */
   content: "▸";
   float: left;
@@ -250,25 +247,25 @@ clickable and can be expanded/collapsed.
   color: var(--sklearn-color-icon);
 }
 
-#sk-container-id-9 label.sk-toggleable__label-arrow:hover:before {
+#sk-container-id-4 label.sk-toggleable__label-arrow:hover:before {
   color: var(--sklearn-color-text);
 }
 
 /* Toggleable content - dropdown */
 
-#sk-container-id-9 div.sk-toggleable__content {
+#sk-container-id-4 div.sk-toggleable__content {
   display: none;
   text-align: left;
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-0);
 }
 
-#sk-container-id-9 div.sk-toggleable__content.fitted {
+#sk-container-id-4 div.sk-toggleable__content.fitted {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-0);
 }
 
-#sk-container-id-9 div.sk-toggleable__content pre {
+#sk-container-id-4 div.sk-toggleable__content pre {
   margin: 0.2em;
   border-radius: 0.25em;
   color: var(--sklearn-color-text);
@@ -276,79 +273,79 @@ clickable and can be expanded/collapsed.
   background-color: var(--sklearn-color-unfitted-level-0);
 }
 
-#sk-container-id-9 div.sk-toggleable__content.fitted pre {
+#sk-container-id-4 div.sk-toggleable__content.fitted pre {
   /* unfitted */
   background-color: var(--sklearn-color-fitted-level-0);
 }
 
-#sk-container-id-9 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+#sk-container-id-4 input.sk-toggleable__control:checked~div.sk-toggleable__content {
   /* Expand drop-down */
   display: block;
   width: 100%;
   overflow: visible;
 }
 
-#sk-container-id-9 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+#sk-container-id-4 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
   content: "▾";
 }
 
 /* Pipeline/ColumnTransformer-specific style */
 
-#sk-container-id-9 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-4 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
   color: var(--sklearn-color-text);
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
-#sk-container-id-9 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-4 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
   background-color: var(--sklearn-color-fitted-level-2);
 }
 
 /* Estimator-specific style */
 
 /* Colorize estimator box */
-#sk-container-id-9 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-4 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
-#sk-container-id-9 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-4 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-2);
 }
 
-#sk-container-id-9 div.sk-label label.sk-toggleable__label,
-#sk-container-id-9 div.sk-label label {
+#sk-container-id-4 div.sk-label label.sk-toggleable__label,
+#sk-container-id-4 div.sk-label label {
   /* The background is the default theme color */
   color: var(--sklearn-color-text-on-default-background);
 }
 
 /* On hover, darken the color of the background */
-#sk-container-id-9 div.sk-label:hover label.sk-toggleable__label {
+#sk-container-id-4 div.sk-label:hover label.sk-toggleable__label {
   color: var(--sklearn-color-text);
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
 /* Label box, darken color on hover, fitted */
-#sk-container-id-9 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+#sk-container-id-4 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
   color: var(--sklearn-color-text);
   background-color: var(--sklearn-color-fitted-level-2);
 }
 
 /* Estimator label */
 
-#sk-container-id-9 div.sk-label label {
+#sk-container-id-4 div.sk-label label {
   font-family: monospace;
   font-weight: bold;
   display: inline-block;
   line-height: 1.2em;
 }
 
-#sk-container-id-9 div.sk-label-container {
+#sk-container-id-4 div.sk-label-container {
   text-align: center;
 }
 
 /* Estimator-specific */
-#sk-container-id-9 div.sk-estimator {
+#sk-container-id-4 div.sk-estimator {
   font-family: monospace;
   border: 1px dotted var(--sklearn-color-border-box);
   border-radius: 0.25em;
@@ -358,18 +355,18 @@ clickable and can be expanded/collapsed.
   background-color: var(--sklearn-color-unfitted-level-0);
 }
 
-#sk-container-id-9 div.sk-estimator.fitted {
+#sk-container-id-4 div.sk-estimator.fitted {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-0);
 }
 
 /* on hover */
-#sk-container-id-9 div.sk-estimator:hover {
+#sk-container-id-4 div.sk-estimator:hover {
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
-#sk-container-id-9 div.sk-estimator.fitted:hover {
+#sk-container-id-4 div.sk-estimator.fitted:hover {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-2);
 }
@@ -457,7 +454,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 
 /* "?"-specific style due to the `<a>` HTML tag */
 
-#sk-container-id-9 a.estimator_doc_link {
+#sk-container-id-4 a.estimator_doc_link {
   float: right;
   font-size: 1rem;
   line-height: 1em;
@@ -472,21 +469,21 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
   border: var(--sklearn-color-unfitted-level-1) 1pt solid;
 }
 
-#sk-container-id-9 a.estimator_doc_link.fitted {
+#sk-container-id-4 a.estimator_doc_link.fitted {
   /* fitted */
   border: var(--sklearn-color-fitted-level-1) 1pt solid;
   color: var(--sklearn-color-fitted-level-1);
 }
 
 /* On hover */
-#sk-container-id-9 a.estimator_doc_link:hover {
+#sk-container-id-4 a.estimator_doc_link:hover {
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-3);
   color: var(--sklearn-color-background);
   text-decoration: none;
 }
 
-#sk-container-id-9 a.estimator_doc_link.fitted:hover {
+#sk-container-id-4 a.estimator_doc_link.fitted:hover {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-3);
 }
@@ -554,7 +551,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
     height: 14px;
     cursor: pointer;
 }
-</style><body><div id="sk-container-id-9" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>MinMaxScaler()</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-9" type="checkbox" checked><label for="sk-estimator-id-9" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>MinMaxScaler</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.7/modules/generated/sklearn.preprocessing.MinMaxScaler.html">?<span>Documentation for MinMaxScaler</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
+</style><body><div id="sk-container-id-4" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>MinMaxScaler()</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-4" type="checkbox" checked><label for="sk-estimator-id-4" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>MinMaxScaler</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.7/modules/generated/sklearn.preprocessing.MinMaxScaler.html">?<span>Documentation for MinMaxScaler</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
         <div class="estimator-table">
             <details>
                 <summary>Parameters</summary>
@@ -654,7 +651,7 @@ plt.imshow(img_scaled.permute(1, 2, 0))
 
 
 
-    <matplotlib.image.AxesImage at 0x16f9b2a1820>
+    <matplotlib.image.AxesImage at 0x20ddc4cbc20>
 
 
 
@@ -680,7 +677,7 @@ plt.imshow(crop.permute(1, 2, 0))
 
 
 
-    <matplotlib.image.AxesImage at 0x16f9b0c75f0>
+    <matplotlib.image.AxesImage at 0x20dd94f8b00>
 
 
 
@@ -911,43 +908,6 @@ def add_patch_to_image(image_tensor, patch, top_left_x, top_left_y):
     return image_with_patch
 ```
 
-
-```python
-# def compress_color_image(image_tensor, rank, learning_rate=0.01, num_epochs=5000, tol=1e-6, device=torch.device("cpu")):
-#     # channels, height, width = image_tensor.shape
-#     # compressed_img = torch.zeros(channels, height, width, device=device)
-
-#     image_tensor = image_tensor.to(device)
-#     R_channel = image_tensor[0].to(device).float()
-#     G_channel = image_tensor[1].to(device).float()
-#     B_channel = image_tensor[2].to(device).float()
-
-#     print("Factorizing the R channel...")
-#     W_R, H_R, loss_R, _ = matrix_factorization(R_channel, rank, learning_rate, num_epochs, tol, device)
-#     print("Factorizing the G channel...")
-#     W_G, H_G, loss_G, _ = matrix_factorization(G_channel, rank, learning_rate, num_epochs, tol, device)
-#     print("Factorizing the B channel...")
-#     W_B, H_B, loss_B, _ = matrix_factorization(B_channel, rank, learning_rate, num_epochs, tol, device)
-
-#     compressed_img = torch.stack([torch.matmul(W_R, H_R), torch.matmul(W_G, H_G), torch.matmul(W_B, H_B)], dim=0)
-
-#     return compressed_img, (loss_R, loss_G, loss_B)
-```
-
-
-```python
-# def compress_compare_evaluate(image_tensor, rank, learning_rate=0.01, num_epochs=5000, tol=1e-6, device=torch.device("cpu")):
-#     compressed_img, color_loss = compress_color_image(image_tensor, rank, learning_rate, num_epochs, tol, device)
-
-#     rmse, psnr = calculate_rmse_psnr(image_tensor, compressed_img)
-#     print(f"\nRMSE: {rmse:.6f}")
-#     print(f"PSNR: {psnr:.6f}")
-
-#     display_patches(image_tensor, compressed_img, rank)
-
-#     return compressed_img, color_loss, rmse, psnr
-```
-
 ## Patch Selection
 
 
@@ -971,7 +931,7 @@ patch3, img3 = extract_patch(crop, patch_size, top_left_x=100, top_left_y=283)  
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_20_1.png)
+![png](Task4_PART_B_files/Task4_PART_B_18_1.png)
     
 
 
@@ -982,7 +942,7 @@ patch3, img3 = extract_patch(crop, patch_size, top_left_x=100, top_left_y=283)  
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_20_3.png)
+![png](Task4_PART_B_files/Task4_PART_B_18_3.png)
     
 
 
@@ -993,7 +953,7 @@ patch3, img3 = extract_patch(crop, patch_size, top_left_x=100, top_left_y=283)  
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_20_5.png)
+![png](Task4_PART_B_files/Task4_PART_B_18_5.png)
     
 
 
@@ -1004,16 +964,21 @@ patch3, img3 = extract_patch(crop, patch_size, top_left_x=100, top_left_y=283)  
 ranks = [5, 10, 25, 50]
 rmse_values_1 = []
 psnr_values_1 = []
+reconstructed_patches_1 = {}   # to store results for each rank
+reconstructed_full_images_1 = {}  # to store full image reconstructions
+
 for rank in ranks:
     print("_" * 100)
     print(f"\n\nRank: {rank}")
     reconstructed_patch_1, W, H, loss_list, rmse_1, psnr_1 = image_reconstruction_matrix(
         patch1, rank=rank, learning_rate=1e-2, num_epochs=5000
     )
+    reconstructed_patches_1[rank] = reconstructed_patch_1
     rmse_values_1.append(rmse_1)
     psnr_values_1.append(psnr_1)
     top_left_x, top_left_y = 0, 0
     img_with_patch_1 = add_patch_to_image(crop, reconstructed_patch_1, top_left_x, top_left_y)
+    reconstructed_full_images_1[rank] = img_with_patch_1
 ```
 
     ____________________________________________________________________________________________________
@@ -1021,18 +986,20 @@ for rank in ranks:
     
     Rank: 5
     Channel 0 converged at step 538, loss=0.000615
+    
+
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.05866415..0.96756566].
+    
+
     Channel 1, Step 1000, Loss=0.000716
     Channel 1 converged at step 1143, loss=0.000541
     Channel 2 converged at step 383, loss=0.000890
     RMSE: 0.026093, PSNR: 31.669529
     
 
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.05866415..0.96756566].
-    
-
 
     
-![png](Task4_PART_B_files/Task4_PART_B_22_2.png)
+![png](Task4_PART_B_files/Task4_PART_B_20_3.png)
     
 
 
@@ -1041,7 +1008,7 @@ for rank in ranks:
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_22_4.png)
+![png](Task4_PART_B_files/Task4_PART_B_20_5.png)
     
 
 
@@ -1063,7 +1030,7 @@ for rank in ranks:
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_22_8.png)
+![png](Task4_PART_B_files/Task4_PART_B_20_9.png)
     
 
 
@@ -1072,7 +1039,7 @@ for rank in ranks:
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_22_10.png)
+![png](Task4_PART_B_files/Task4_PART_B_20_11.png)
     
 
 
@@ -1096,7 +1063,7 @@ for rank in ranks:
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_22_14.png)
+![png](Task4_PART_B_files/Task4_PART_B_20_15.png)
     
 
 
@@ -1105,7 +1072,7 @@ for rank in ranks:
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_22_16.png)
+![png](Task4_PART_B_files/Task4_PART_B_20_17.png)
     
 
 
@@ -1132,7 +1099,7 @@ for rank in ranks:
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_22_20.png)
+![png](Task4_PART_B_files/Task4_PART_B_20_21.png)
     
 
 
@@ -1141,7 +1108,72 @@ for rank in ranks:
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_22_22.png)
+![png](Task4_PART_B_files/Task4_PART_B_20_23.png)
+    
+
+
+
+```python
+plt.figure(figsize=(25, 6))
+plt.subplot(1, len(ranks)+1, 1)
+plt.imshow(rearrange(patch1, 'c h w -> h w c').cpu().numpy())
+plt.title("Original Patch")
+plt.axis('off')
+
+for i, rank in enumerate(ranks):
+    plt.subplot(1, len(ranks)+1, i+2)
+    plt.imshow(rearrange(reconstructed_patches_1[rank], 'c h w -> h w c').cpu().detach().numpy())
+    plt.title(f"Rank={rank}")
+    plt.axis('off')
+
+plt.suptitle("Original vs Reconstructed Patches (Different Ranks)")
+plt.show()
+
+
+
+plt.figure(figsize=(25, 6))
+
+# 1️⃣ Original full image
+plt.subplot(1, len(ranks) + 1, 1)
+plt.imshow(rearrange(crop, 'c h w -> h w c').cpu().numpy())
+plt.title("Original Image")
+plt.axis('off')
+
+# 2️⃣ Reconstructed full images for each rank
+for i, rank in enumerate(ranks):
+    plt.subplot(1, len(ranks) + 1, i + 2)
+    plt.imshow(rearrange(reconstructed_full_images_1[rank], 'c h w -> h w c').cpu().detach().numpy())
+    plt.title(f"Rank={rank}")
+    plt.axis('off')
+
+plt.suptitle("Original vs Reconstructed Full Images (Different Ranks)", fontsize=16)
+plt.show()
+
+
+
+```
+
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.05866415..0.96756566].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.05947916..0.92217594].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.0895432..0.9660532].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.09275755..0.97218025].
+    
+
+
+    
+![png](Task4_PART_B_files/Task4_PART_B_21_1.png)
+    
+
+
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.05866415053606033..1.0].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.059479158371686935..1.0].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.08954320102930069..1.0].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.09275755286216736..1.0].
+    
+
+
+    
+![png](Task4_PART_B_files/Task4_PART_B_21_3.png)
     
 
 
@@ -1152,7 +1184,7 @@ plot_rmse_psnr(ranks, rmse_values_1, psnr_values_1, patch_id=1)
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_23_0.png)
+![png](Task4_PART_B_files/Task4_PART_B_22_0.png)
     
 
 
@@ -1163,46 +1195,50 @@ plot_rmse_psnr(ranks, rmse_values_1, psnr_values_1, patch_id=1)
 ranks = [5, 10, 25, 50]
 rmse_values_2 = []
 psnr_values_2 = []
+reconstructed_patches_2 = {}   # to store results for each rank
+reconstructed_full_images_2 = {}  # to store full image reconstructions
 for rank in ranks:
     print("_" * 100)
     print(f"\n\nRank: {rank}")
     reconstructed_patch_2, W, H, loss_list, rmse_2, psnr_2 = image_reconstruction_matrix(
         patch2, rank=rank, learning_rate=1e-2, num_epochs=5000
     )
+    reconstructed_patches_2[rank] = reconstructed_patch_2
     rmse_values_2.append(rmse_2)
     psnr_values_2.append(psnr_2)
     top_left_x, top_left_y = 170, 330
     img_with_patch_2 = add_patch_to_image(crop, reconstructed_patch_2, top_left_x, top_left_y)
+    reconstructed_full_images_2[rank] = img_with_patch_2
 ```
 
     ____________________________________________________________________________________________________
     
     
     Rank: 5
-    Channel 0, Step 1000, Loss=0.001761
-    Channel 0 converged at step 1322, loss=0.001321
-    Channel 1 converged at step 851, loss=0.001700
+    Channel 0, Step 1000, Loss=0.001506
+    Channel 0 converged at step 1148, loss=0.001305
     
 
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.085946366..0.9209747].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.047862686..0.92735773].
     
 
-    Channel 2 converged at step 657, loss=0.001018
-    RMSE: 0.036683, PSNR: 28.710768
-    
-
-
-    
-![png](Task4_PART_B_files/Task4_PART_B_25_3.png)
-    
-
-
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.08594636619091034..1.0].
+    Channel 1 converged at step 934, loss=0.001807
+    Channel 2 converged at step 575, loss=0.000945
+    RMSE: 0.036759, PSNR: 28.692768
     
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_25_5.png)
+![png](Task4_PART_B_files/Task4_PART_B_24_3.png)
+    
+
+
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.04786268621683121..1.0].
+    
+
+
+    
+![png](Task4_PART_B_files/Task4_PART_B_24_5.png)
     
 
 
@@ -1210,31 +1246,31 @@ for rank in ranks:
     
     
     Rank: 10
-    Channel 0, Step 1000, Loss=0.001653
-    Channel 0 converged at step 1506, loss=0.000957
-    Channel 1, Step 1000, Loss=0.001671
-    Channel 1 converged at step 1536, loss=0.000761
+    Channel 0, Step 1000, Loss=0.001783
+    Channel 0 converged at step 1517, loss=0.001053
+    Channel 1, Step 1000, Loss=0.002498
+    Channel 1 converged at step 1602, loss=0.001063
     
 
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.047744077..0.9168237].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.06753179..0.9366547].
     
 
-    Channel 2 converged at step 907, loss=0.000869
-    RMSE: 0.029345, PSNR: 30.649189
-    
-
-
-    
-![png](Task4_PART_B_files/Task4_PART_B_25_9.png)
-    
-
-
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.04774407669901848..1.0].
+    Channel 2 converged at step 985, loss=0.000977
+    RMSE: 0.032091, PSNR: 29.872330
     
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_25_11.png)
+![png](Task4_PART_B_files/Task4_PART_B_24_9.png)
+    
+
+
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.06753178685903549..1.0].
+    
+
+
+    
+![png](Task4_PART_B_files/Task4_PART_B_24_11.png)
     
 
 
@@ -1242,31 +1278,33 @@ for rank in ranks:
     
     
     Rank: 25
-    Channel 0, Step 1000, Loss=0.004591
-    Channel 0 converged at step 1953, loss=0.000837
-    Channel 1, Step 1000, Loss=0.003986
-    Channel 1, Step 2000, Loss=0.000954
-    Channel 1 converged at step 2075, loss=0.000875
-    Channel 2, Step 1000, Loss=0.002591
-    Channel 2 converged at step 1596, loss=0.000853
-    RMSE: 0.029225, PSNR: 30.685009
+    Channel 0, Step 1000, Loss=0.004066
+    Channel 0 converged at step 1860, loss=0.000956
+    Channel 1, Step 1000, Loss=0.004598
+    Channel 1, Step 2000, Loss=0.000916
+    Channel 1 converged at step 2022, loss=0.000894
     
 
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.09514537..0.9317188].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.06216677..0.9331778].
     
 
-
-    
-![png](Task4_PART_B_files/Task4_PART_B_25_14.png)
-    
-
-
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.09514536708593369..1.0].
+    Channel 2, Step 1000, Loss=0.002515
+    Channel 2 converged at step 1582, loss=0.000782
+    RMSE: 0.029598, PSNR: 30.574768
     
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_25_16.png)
+![png](Task4_PART_B_files/Task4_PART_B_24_15.png)
+    
+
+
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.06216676905751228..1.0].
+    
+
+
+    
+![png](Task4_PART_B_files/Task4_PART_B_24_17.png)
     
 
 
@@ -1274,35 +1312,97 @@ for rank in ranks:
     
     
     Rank: 50
-    Channel 0, Step 1000, Loss=0.009382
-    Channel 0, Step 2000, Loss=0.001188
-    Channel 0 converged at step 2302, loss=0.000785
-    Channel 1, Step 1000, Loss=0.008220
-    Channel 1, Step 2000, Loss=0.001068
-    Channel 1 converged at step 2258, loss=0.000734
-    Channel 2, Step 1000, Loss=0.007362
+    Channel 0, Step 1000, Loss=0.009900
+    Channel 0, Step 2000, Loss=0.001348
+    Channel 0 converged at step 2374, loss=0.000798
+    Channel 1, Step 1000, Loss=0.009104
+    Channel 1, Step 2000, Loss=0.001373
+    Channel 1 converged at step 2404, loss=0.000801
+    Channel 2, Step 1000, Loss=0.008447
     
 
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.07525571..0.9245172].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.08049348..0.9363485].
     
 
-    Channel 2, Step 2000, Loss=0.000769
-    Channel 2 converged at step 2071, loss=0.000692
-    RMSE: 0.027133, PSNR: 31.330164
-    
-
-
-    
-![png](Task4_PART_B_files/Task4_PART_B_25_20.png)
-    
-
-
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.07525570690631866..1.0].
+    Channel 2, Step 2000, Loss=0.000841
+    Channel 2 converged at step 2159, loss=0.000650
+    RMSE: 0.027360, PSNR: 31.257809
     
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_25_22.png)
+![png](Task4_PART_B_files/Task4_PART_B_24_21.png)
+    
+
+
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.08049347996711731..1.0].
+    
+
+
+    
+![png](Task4_PART_B_files/Task4_PART_B_24_23.png)
+    
+
+
+
+```python
+plt.figure(figsize=(25, 6))
+plt.subplot(1, len(ranks)+1, 1)
+plt.imshow(rearrange(patch2, 'c h w -> h w c').cpu().numpy())
+plt.title("Original Patch")
+plt.axis('off')
+
+for i, rank in enumerate(ranks):
+    plt.subplot(1, len(ranks)+1, i+2)
+    plt.imshow(rearrange(reconstructed_patches_2[rank], 'c h w -> h w c').cpu().detach().numpy())
+    plt.title(f"Rank={rank}")
+    plt.axis('off')
+
+plt.suptitle("Original vs Reconstructed Patches (Different Ranks)")
+plt.show()
+
+
+plt.figure(figsize=(25, 6))
+
+# 1️⃣ Original full image
+plt.subplot(1, len(ranks) + 1, 1)
+plt.imshow(rearrange(crop, 'c h w -> h w c').cpu().numpy())
+plt.title("Original Image")
+plt.axis('off')
+
+# 2️⃣ Reconstructed full images for each rank
+for i, rank in enumerate(ranks):
+    plt.subplot(1, len(ranks) + 1, i + 2)
+    plt.imshow(rearrange(reconstructed_full_images_2[rank], 'c h w -> h w c').cpu().detach().numpy())
+    plt.title(f"Rank={rank}")
+    plt.axis('off')
+
+plt.suptitle("Original vs Reconstructed Full Images (Different Ranks)", fontsize=16)
+plt.show()
+
+```
+
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.047862686..0.92735773].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.06753179..0.9366547].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.06216677..0.9331778].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.08049348..0.9363485].
+    
+
+
+    
+![png](Task4_PART_B_files/Task4_PART_B_25_1.png)
+    
+
+
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.04786268621683121..1.0].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.06753178685903549..1.0].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.06216676905751228..1.0].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.08049347996711731..1.0].
+    
+
+
+    
+![png](Task4_PART_B_files/Task4_PART_B_25_3.png)
     
 
 
@@ -1324,32 +1424,39 @@ plot_rmse_psnr(ranks, rmse_values_2, psnr_values_2, patch_id=2)
 ranks = [5, 10, 25, 50]
 rmse_values_3 = []
 psnr_values_3 = []
+reconstructed_patches_3 = {}   # to store results for each rank
+reconstructed_full_images_3 = {}  # to store full image reconstructions
 for rank in ranks:
     print("_" * 100)
     print(f"\n\nRank: {rank}")
     reconstructed_patch_3, W, H, loss_list, rmse_3, psnr_3 = image_reconstruction_matrix(
         patch3, rank=rank, learning_rate=1e-2, num_epochs=5000
     )
+    reconstructed_patches_3[rank] = reconstructed_patch_3
+    
     rmse_values_3.append(rmse_3)
     psnr_values_3.append(psnr_3)
     top_left_x, top_left_y = 100, 283
     img_with_patch_3 = add_patch_to_image(crop, reconstructed_patch_3, top_left_x, top_left_y)
+    reconstructed_full_images_3[rank] = img_with_patch_3
 ```
 
     ____________________________________________________________________________________________________
     
     
     Rank: 5
-    Channel 0 converged at step 911, loss=0.003369
-    Channel 1, Step 1000, Loss=0.005540
-    Channel 1 converged at step 1186, loss=0.005197
+    Channel 0, Step 1000, Loss=0.003771
+    Channel 0 converged at step 1012, loss=0.003759
+    Channel 1, Step 1000, Loss=0.005688
+    Channel 1 converged at step 1195, loss=0.005292
     
 
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.05971014..1.0365453].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.07414706..1.047014].
     
 
-    Channel 2 converged at step 903, loss=0.003844
-    RMSE: 0.064309, PSNR: 23.834587
+    Channel 2, Step 1000, Loss=0.003455
+    Channel 2 converged at step 1012, loss=0.003443
+    RMSE: 0.064527, PSNR: 23.805189
     
 
 
@@ -1358,7 +1465,7 @@ for rank in ranks:
     
 
 
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.05971014127135277..1.0365452766418457].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.0741470605134964..1.0470139980316162].
     
 
 
@@ -1371,18 +1478,18 @@ for rank in ranks:
     
     
     Rank: 10
-    Channel 0, Step 1000, Loss=0.003585
-    Channel 0 converged at step 1687, loss=0.001703
-    Channel 1, Step 1000, Loss=0.004540
-    Channel 1 converged at step 1726, loss=0.001806
+    Channel 0, Step 1000, Loss=0.003362
+    Channel 0 converged at step 1673, loss=0.001388
+    Channel 1, Step 1000, Loss=0.004855
+    Channel 1 converged at step 1896, loss=0.001753
     
 
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.056449518..1.0108721].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.08343879..1.0083421].
     
 
-    Channel 2, Step 1000, Loss=0.002875
-    Channel 2 converged at step 1603, loss=0.001484
-    RMSE: 0.040786, PSNR: 27.789709
+    Channel 2, Step 1000, Loss=0.003321
+    Channel 2 converged at step 1661, loss=0.001417
+    RMSE: 0.038967, PSNR: 28.186138
     
 
 
@@ -1391,7 +1498,7 @@ for rank in ranks:
     
 
 
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.056449517607688904..1.0108721256256104].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.08343879133462906..1.0083421468734741].
     
 
 
@@ -1404,21 +1511,21 @@ for rank in ranks:
     
     
     Rank: 25
-    Channel 0, Step 1000, Loss=0.005509
-    Channel 0, Step 2000, Loss=0.001498
-    Channel 0 converged at step 2402, loss=0.000967
-    Channel 1, Step 1000, Loss=0.006776
-    Channel 1, Step 2000, Loss=0.001697
-    Channel 1 converged at step 2499, loss=0.001018
-    Channel 2, Step 1000, Loss=0.005684
+    Channel 0, Step 1000, Loss=0.005227
+    Channel 0, Step 2000, Loss=0.001549
+    Channel 0 converged at step 2430, loss=0.001001
+    Channel 1, Step 1000, Loss=0.007270
+    Channel 1, Step 2000, Loss=0.001502
+    Channel 1 converged at step 2342, loss=0.001011
+    Channel 2, Step 1000, Loss=0.006039
     
 
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.051913563..1.0436265].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.059526715..1.0137945].
     
 
-    Channel 2, Step 2000, Loss=0.001386
-    Channel 2 converged at step 2241, loss=0.001104
-    RMSE: 0.032076, PSNR: 29.876266
+    Channel 2, Step 2000, Loss=0.001517
+    Channel 2 converged at step 2341, loss=0.001101
+    RMSE: 0.032201, PSNR: 29.842598
     
 
 
@@ -1427,7 +1534,7 @@ for rank in ranks:
     
 
 
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.051913563162088394..1.0436265468597412].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.0595267154276371..1.0137945413589478].
     
 
 
@@ -1440,35 +1547,95 @@ for rank in ranks:
     
     
     Rank: 50
-    Channel 0, Step 1000, Loss=0.010227
-    Channel 0, Step 2000, Loss=0.001517
-    Channel 0 converged at step 2473, loss=0.000831
-    Channel 1, Step 1000, Loss=0.010651
-    Channel 1, Step 2000, Loss=0.001710
-    Channel 1 converged at step 2571, loss=0.000830
-    Channel 2, Step 1000, Loss=0.010115
-    Channel 2, Step 2000, Loss=0.001925
+    Channel 0, Step 1000, Loss=0.009550
+    Channel 0, Step 2000, Loss=0.001513
+    Channel 0 converged at step 2411, loss=0.000945
+    Channel 1, Step 1000, Loss=0.010726
+    Channel 1, Step 2000, Loss=0.001750
+    Channel 1 converged at step 2558, loss=0.000893
+    Channel 2, Step 1000, Loss=0.010919
+    Channel 2, Step 2000, Loss=0.001645
+    Channel 2 converged at step 2464, loss=0.000950
+    RMSE: 0.030468, PSNR: 30.323145
     
 
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.060009062..1.0249729].
-    
-
-    Channel 2 converged at step 2631, loss=0.000985
-    RMSE: 0.029682, PSNR: 30.550005
-    
-
-
-    
-![png](Task4_PART_B_files/Task4_PART_B_28_21.png)
-    
-
-
-    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.06000906229019165..1.024972915649414].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.07291956..1.0257292].
     
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_28_23.png)
+![png](Task4_PART_B_files/Task4_PART_B_28_20.png)
+    
+
+
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.072919562458992..1.0257291793823242].
+    
+
+
+    
+![png](Task4_PART_B_files/Task4_PART_B_28_22.png)
+    
+
+
+
+```python
+plt.figure(figsize=(25, 6))
+plt.subplot(1, len(ranks)+1, 1)
+plt.imshow(rearrange(patch3, 'c h w -> h w c').cpu().numpy())
+plt.title("Original Patch")
+plt.axis('off')
+
+for i, rank in enumerate(ranks):
+    plt.subplot(1, len(ranks)+1, i+2)
+    plt.imshow(rearrange(reconstructed_patches_3[rank], 'c h w -> h w c').cpu().detach().numpy())
+    plt.title(f"Rank={rank}")
+    plt.axis('off')
+
+plt.suptitle("Original vs Reconstructed Patches (Different Ranks)")
+plt.show()
+
+
+plt.figure(figsize=(25, 6))
+
+# 1️⃣ Original full image
+plt.subplot(1, len(ranks) + 1, 1)
+plt.imshow(rearrange(crop, 'c h w -> h w c').cpu().numpy())
+plt.title("Original Image")
+plt.axis('off')
+
+# 2️⃣ Reconstructed full images for each rank
+for i, rank in enumerate(ranks):
+    plt.subplot(1, len(ranks) + 1, i + 2)
+    plt.imshow(rearrange(reconstructed_full_images_3[rank], 'c h w -> h w c').cpu().detach().numpy())
+    plt.title(f"Rank={rank}")
+    plt.axis('off')
+
+plt.suptitle("Original vs Reconstructed Full Images (Different Ranks)", fontsize=16)
+plt.show()
+
+```
+
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.07414706..1.047014].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.08343879..1.0083421].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.059526715..1.0137945].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.07291956..1.0257292].
+    
+
+
+    
+![png](Task4_PART_B_files/Task4_PART_B_29_1.png)
+    
+
+
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.0741470605134964..1.0470139980316162].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.08343879133462906..1.0083421468734741].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.0595267154276371..1.0137945413589478].
+    Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-0.072919562458992..1.0257291793823242].
+    
+
+
+    
+![png](Task4_PART_B_files/Task4_PART_B_29_3.png)
     
 
 
@@ -1479,7 +1646,7 @@ plot_rmse_psnr(ranks, rmse_values_3, psnr_values_3, patch_id=3)
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_29_0.png)
+![png](Task4_PART_B_files/Task4_PART_B_30_0.png)
     
 
 
@@ -1518,22 +1685,13 @@ def plot_rmse_psnr_multiple_patches(ranks, rmse_values_list, psnr_values_list, p
     plt.tight_layout()
     plt.show()
 
-# Suppose you already have:
-# ranks = [5, 10, 15, 20, 25]
-# rmse_values_1, rmse_values_2, rmse_values_3
-# psnr_values_1, psnr_values_2, psnr_values_3
-
-# Suppose you already have:
-# ranks = [5, 10, 15, 20, 25]
-# rmse_values_1, rmse_values_2, rmse_values_3
-# psnr_values_1, psnr_values_2, psnr_values_3
+# Plot RMSE and PSNR trends for all patches together
 
 plot_rmse_psnr_multiple_patches(
     ranks,
     [rmse_values_1, rmse_values_2, rmse_values_3],
     [psnr_values_1, psnr_values_2, psnr_values_3],
     patch_ids=[1, 2, 3]
-
 )
 
 
@@ -1541,10 +1699,55 @@ plot_rmse_psnr_multiple_patches(
 
 
     
-![png](Task4_PART_B_files/Task4_PART_B_30_0.png)
+![png](Task4_PART_B_files/Task4_PART_B_31_0.png)
     
 
 
-### OBSERVATIONS (WRITE MORE)
 
-The RMSE vs Rank plot shows a decreasing trend, while PSNR vs Rank shows an increasing trend for all patches, confirming the quantitative improvement in reconstruction quality.
+## Observations: Data Compression using Low-Rank Matrix Factorization
+
+### 1. Single-Color Patch
+- The patch contains only one dominant color, so pixel values are highly correlated.  
+- Even with a **low rank (r = 5)**, the reconstructed image looks almost identical to the original patch.  
+- Increasing rank beyond 10 does **not significantly improve** visual quality or RMSE/PSNR.  
+- **Observation:** Low-rank factorization performs very well for uniform regions since the information content is minimal.
+
+---
+
+### 2. Patch with 2–3 Colors
+- Here, pixel variations are more noticeable than in the single-color case.  
+- For **r = 5**, there is visible **blurring or color mixing** at boundaries.  
+- As the rank increases (**r = 10 → 25 → 50**), edges become sharper and colors are more distinct.  
+- **Observation:** A moderate rank (around 25) provides a good trade-off between compression and quality.
+
+---
+
+### 3. Patch with 5 or More Colors
+- These patches have **high-frequency details** and **greater color variation**.  
+- For low ranks (**r = 5, 10**), the reconstruction appears **blurred** and loses fine details.  
+- Increasing rank to **25 or 50** recovers much of the structure, with significantly lower RMSE and higher PSNR.  
+- **Observation:** Complex image regions require higher ranks for accurate reconstruction.
+
+---
+
+### 4. General Trend
+
+| Rank (r) | RMSE ↓ | PSNR ↑ | Visual Quality | Compression Ratio |
+|-----------|---------|---------|----------------|------------------|
+| 5         | High error | Low | Blurry / Smoothed | Very High (Best Compression) |
+| 10        | Moderate error | Medium | Fairly clear | High |
+| 25        | Low error | High | Sharp and clear | Moderate |
+| 50        | Very low error | Very high | Nearly identical | Low (Least Compression) |
+
+- **Higher rank →** better reconstruction but less compression.  
+- **Lower rank →** higher compression but reduced quality.
+
+---
+
+### Conclusion
+- Low-rank matrix factorization compresses images effectively by representing them with fewer parameters.  
+- The **optimal rank** depends on the **complexity** of the patch: smoother regions need smaller ranks, while detailed regions need larger ranks.  
+- This illustrates the fundamental trade-off between **data compression** and **reconstruction accuracy**.
+
+
+
