@@ -1,3 +1,7 @@
+# Task 4 – Part A: Image Reconstruction using Matrix Factorization
+
+## Objective  
+To reconstruct masked images using **Matrix Factorization** techniques, specifically **Gradient Descent (GD)** and **Alternating Least Squares (ALS)** and evaluate reconstruction quality using **RMSE** and **PSNR** metrics.
 
 Original Image:
 
@@ -842,4 +846,70 @@ Optimal Value of Rank:
     Rank: 50
     PSNR: 43.8846
     RMSE: 0.0064
-    
+
+# Observations
+
+## Reconstruction using Gradient Descent (GD)  
+
+The GD-based MF approach iteratively updates factor matrices **W** and **H** to minimize the reconstruction loss over known pixel values.
+
+### Results  
+Reconstruction was performed for different **ranks**.
+
+- **Rectangular mask:**  
+  - RMSE gradually decreased with higher rank.  
+  - PSNR increased slightly, showing better reconstruction at higher rank.  
+  - Very high rank (r = 50) caused minor noise or overfitting to known pixels.
+
+- **Random pixel mask:**  
+  - Performed better than rectangular masking due to evenly distributed known pixels.  
+  - Reconstructed images preserved finer details.
+
+### Observation  
+- GD achieved stable convergence but required careful learning rate tuning.  
+- Reconstruction quality improved with rank up to an optimal point.
+
+---
+
+## Reconstruction using Alternating Least Squares (ALS)  
+
+ALS alternately optimises one factor matrix while keeping the other fixed, solving least-squares subproblems at each step.
+
+### Results  
+ALS was tested using the same masks and ranks.
+
+- **Rectangular patch:**  
+  - RMSE values were slightly lower than GD.  
+  - PSNR was consistently higher, indicating cleaner reconstruction.  
+
+- **Random mask:**  
+  - Produced sharper reconstructions and preserved edges better.  
+  - Converged faster and was more stable than GD.
+
+### Observation  
+- ALS handled missing pixel patterns efficiently.  
+- Increasing rank improved image quality until it reached a saturation point.
+
+---
+
+
+## Rank = 20 Performance Summary
+
+| Method | Mask Type | RMSE | PSNR (dB) | Remarks |
+|---------|------------|--------|-----------|--------------------------------------------|
+| **GD (Gradient Descent)** | Rectangular Patch | 0.009925 | 40.07 | Moderate reconstruction; slight overfitting avoided |
+| **GD (Gradient Descent)** | Random 900 Pixels | 0.006735 | 43.43 | Best GD performance; fine details well restored |
+| **ALS (Alternating Least Squares)** | Rectangular Patch | 0.009095 | 40.82 | Slightly better than GD in clarity and stability |
+| **ALS (Alternating Least Squares)** | Random 900 Pixels | 0.007756 | 42.21 | Sharpest reconstruction; highest stability and PSNR |
+
+---
+
+## Best performance:
+
+| Case | Method | Best Rank | RMSE ↓ | PSNR ↑ |
+|------|---------|------------|---------|---------|
+| Rectangular Patch | GD | 50 | 0.0089 | 41.02 |
+| Rectangular Patch | ALS | 10 | 0.0088 | 41.16 |
+| Random 900 Pixels | GD | 100 | 0.0024 | 52.36 |
+| Random 900 Pixels | ALS | 50 | 0.0064 | 43.88 |
+
