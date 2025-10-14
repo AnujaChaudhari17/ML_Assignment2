@@ -60,7 +60,7 @@ y = f_x + eps
 
 ### 3. Working with Autoregressive Modeling [2 Marks]
 
-- **[2 marks]**  Consider the [Daily Temperatures dataset](https://raw.githubusercontent.com/jbrownlee/Datasets/master/daily-min-temperatures.csv) from Australia. This is a dataset for a forecasting task. That is, given temperatures up to date (or period) T, design a forecasting (autoregressive) model to predict the temperature on date T+1. You can refer to [link 1](https://www.turing.com/kb/guide-to-autoregressive-models), [link 2](https://otexts.com/fpp2/AR.html) for more information on autoregressive models. Use linear regression as your autoregressive model. Plot the fit of your predictions vs the true values and report the RMSE obtained. A demonstration of the plot is given below. ![imgsrc](./Autoregressive_Demo.png)
+- **[2 marks]**  Consider the [Daily Temperatures dataset](https://raw.githubusercontent.com/jbrownlee/Datasets/master/daily-min-temperatures.csv) from Australia. This is a dataset for a forecasting task. That is, given temperatures up to date (or period) T, design a forecasting (autoregressive) model to predict the temperature on date T+1. You can refer to [link 1](https://www.turing.com/kb/guide-to-autoregressive-models), [link 2](https://otexts.com/fpp2/AR.html) for more information on autoregressive models. Use linear regression as your autoregressive model. Plot the fit of your predictions vs the true values and report the RMSE obtained.
 
 
 
@@ -89,13 +89,7 @@ Use the [instructor's notebook](https://github.com/nipunbatra/ml-teaching/blob/m
 
     Vary the low-rank value as ```r = [5, 10, 25, 50]```  for each of the cases. Use Gradient Descent and plot the reconstructed patches over the original image (retaining all pixel values outside the patch, and using your learnt compressed matrix in place of the patch) to demonstrate difference in reconstruction quality. Write your observations. 
 
-Here is a reference set of patches chosen for each of the 3 cases from left to right. 
 
-<div style="display: flex;">
-<img src="sample_images/1colour.jpg" alt="Image 1" width="250"/>
-<img src="sample_images/2-3_colours.jpg" alt="Image 2" width="270"/>
-<img src="sample_images/multiple_colours.jpg" alt="Image 3" width="265"/>
-</div>
 
 ### 5. Logistic Regression in PyTorch [2 marks]
 
