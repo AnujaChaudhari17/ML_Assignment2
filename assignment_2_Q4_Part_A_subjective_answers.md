@@ -1,325 +1,31 @@
-```python
-pip install torch torchvision
-```
 
-    Requirement already satisfied: torch in c:\users\ginis\appdata\local\programs\python\python312\lib\site-packages (2.8.0)
-    Requirement already satisfied: torchvision in c:\users\ginis\appdata\local\programs\python\python312\lib\site-packages (0.23.0)
-    Requirement already satisfied: filelock in c:\users\ginis\appdata\local\programs\python\python312\lib\site-packages (from torch) (3.19.1)
-    Requirement already satisfied: typing-extensions>=4.10.0 in c:\users\ginis\appdata\local\programs\python\python312\lib\site-packages (from torch) (4.14.1)
-    Requirement already satisfied: sympy>=1.13.3 in c:\users\ginis\appdata\local\programs\python\python312\lib\site-packages (from torch) (1.14.0)
-    Requirement already satisfied: networkx in c:\users\ginis\appdata\local\programs\python\python312\lib\site-packages (from torch) (3.5)
-    Requirement already satisfied: jinja2 in c:\users\ginis\appdata\local\programs\python\python312\lib\site-packages (from torch) (3.1.6)
-    Requirement already satisfied: fsspec in c:\users\ginis\appdata\local\programs\python\python312\lib\site-packages (from torch) (2025.9.0)
-    Requirement already satisfied: setuptools in c:\users\ginis\appdata\local\programs\python\python312\lib\site-packages (from torch) (80.9.0)
-    Requirement already satisfied: numpy in c:\users\ginis\appdata\local\programs\python\python312\lib\site-packages (from torchvision) (2.3.1)
-    Requirement already satisfied: pillow!=8.3.*,>=5.3.0 in c:\users\ginis\appdata\local\programs\python\python312\lib\site-packages (from torchvision) (11.3.0)
-    Requirement already satisfied: mpmath<1.4,>=1.1.0 in c:\users\ginis\appdata\local\programs\python\python312\lib\site-packages (from sympy>=1.13.3->torch) (1.3.0)
-    Requirement already satisfied: MarkupSafe>=2.0 in c:\users\ginis\appdata\local\programs\python\python312\lib\site-packages (from jinja2->torch) (3.0.2)
-    Note: you may need to restart the kernel to use updated packages.
-    
-
-    
-    [notice] A new release of pip is available: 24.0 -> 25.2
-    [notice] To update, run: python.exe -m pip install --upgrade pip
-    
-
-
-```python
-import torch
-import torchvision
-import torchvision.transforms as transforms
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-
-
-# Remove all the warnings
-import warnings
-warnings.filterwarnings('ignore')
-
-import os
-device =    "cpu"
-
-# Retina display
-%config InlineBackend.figure_format = 'retina'
-
-try:
-    from einops import rearrange
-except ImportError:
-    %pip install einops
-    from einops import rearrange
-```
-
-
-```python
-from sklearn import preprocessing
-def normalize_image(image_tensor):
-    image_tensor = image_tensor.float() / 255.0
-    return image_tensor
-# Load and preprocess image
-color_img = torchvision.io.read_image("./iitgn.jpg")
-color_img = color_img.to(dtype=torch.float32)  # Ensure tensor is of type float
-
-# Normalize the image
-color_img = normalize_image(color_img)
-print("Min pixel value:", color_img.min().item())
-print("Max pixel value:", color_img.max().item())
-plt.imshow(color_img.permute(1, 2, 0).cpu().numpy())
-print(color_img.shape)
-```
-
-    Min pixel value: 0.0
-    Max pixel value: 1.0
-    torch.Size([3, 640, 1280])
-    
-
+Original Image:
 
     
 ![png](Task4_PART_A_files/Task4_PART_A_2_1.png)
     
 
-
-
-```python
-crop = torchvision.transforms.CenterCrop(300)
-img_cropped = crop(color_img)
-print(img_cropped.shape)
-
-plt.imshow(img_cropped.permute(1, 2, 0)) # Convert from (C, H, W) (Pytorch default format) to (H, W, C) (Matplotlib format) for displaying
-
-print("Min pixel value:", img_cropped.min().item())
-print("Max pixel value:", img_cropped.max().item())
-```
-
-    torch.Size([3, 300, 300])
-    Min pixel value: 0.0
-    Max pixel value: 1.0
-    
-
+Cropped Image: 
 
     
 ![png](Task4_PART_A_files/Task4_PART_A_3_1.png)
     
 
-
-
-```python
-def show_images(original, masked, title_mask):
-    fig, axes = plt.subplots(1, 2, figsize=(10,5))
-    axes[0].imshow(original.permute(1,2,0).cpu().numpy())
-    axes[0].set_title("Original")
-    axes[0].axis('off')
-
-    # Show masked image with NaNs replaced by 0 (black pixels) for visualization
-    axes[1].imshow(torch.nan_to_num(masked, nan=0.0).permute(1,2,0).cpu().numpy())
-    axes[1].set_title("Masked")
-    axes[1].axis('off')
-    
-    plt.suptitle(title_mask)
-    plt.show()
-
-def mask_rectangular(image, top=100, left=100, block_size=30):
-    masked = image.clone()
-    masked[:, top:top+block_size, left:left+block_size] = float('nan')  # put NaNs
-    return masked
-
-def mask_random(image, num_pixels=900):
-    masked = image.clone()
-    C, H, W = masked.shape
-    
-    # Pick random flat indices
-    flat_indices = torch.randperm(H*W)[:num_pixels]
-    
-    # Convert flat indices to 2D
-    rows = flat_indices // W
-    cols = flat_indices % W
-    
-    # Mask pixels (all channels at once)
-    masked[:, rows, cols] = float('nan')
-    return masked
-
-
-masked_rect = mask_rectangular(img_cropped, top=100, left=100)  # choose where to cut
-show_images(img_cropped, masked_rect, title_mask="Masked (30*30 rectangular pixels)")
-
-masked_rand = mask_random(img_cropped, num_pixels=900)
-show_images(img_cropped, masked_rand, title_mask="Masked (900 random pixels)")
-
-```
-
+Masked Images: 
 
     
 ![png](Task4_PART_A_files/Task4_PART_A_4_0.png)
     
 
 
-
     
 ![png](Task4_PART_A_files/Task4_PART_A_4_1.png)
     
 
+### Image Reconstruction with Varying Ranks using Gradient Descent on Rectangular Patch:
+   
 
 
-```python
-import torch
-import torch.nn.functional as F
-import torch.optim as optim
-from einops import rearrange
-import matplotlib.pyplot as plt
-
-
-# -----------------------------------------------------
-# 1. MATRIX FACTORIZATION USING GRADIENT DESCENT
-# -----------------------------------------------------
-def matrix_factorization_gradient(image_tensor, rank=20, learning_rate=0.01, num_epochs=5000, tol=1e-6, device=torch.device("cpu")):
-    """
-    Perform matrix factorization on masked image using gradient descent (Adam).
-
-    Args:
-        M (torch.Tensor): Masked image tensor of shape (C, H, W)
-        r (int): Rank for low-rank approximation
-        lr (float): Learning rate
-        steps (int): Number of iterations
-        tol (float): Tolerance for early stopping
-        device (torch.device): CPU or CUDA device
-
-    Returns:
-        W_list (torch.Tensor): Factor matrix W (C, H, r)
-        H_list (torch.Tensor): Factor matrix H (C, r, W)
-        loss_list (list): Loss values per channel
-    """
-    image_tensor = image_tensor.to(device)
-    channels, height, width = image_tensor.shape
-    W = torch.randn(channels, height, rank, requires_grad=True, device=device)
-    H = torch.randn(channels, rank, width, requires_grad=True, device=device)
-    optimizer = optim.Adam([W, H], lr=learning_rate)
-    mask = ~torch.isnan(image_tensor)
-    loss_list = []
-    prev_loss = float('inf')
-    for i in range(1, num_epochs + 1):
-        diff_matrix = torch.einsum('chr,crw->chw', W, H) - image_tensor # Reconstructed (Matrix Multiplication of W and H) - Original
-        diff_vector = diff_matrix[mask] # Only consider known pixels
-        loss = torch.norm(diff_vector)  # Frobenius norm = L2 Norm
-        loss_list.append(loss.item())
-        if i % 1000 == 0:
-            print(f"Iteration {i}, loss: {loss.item()}")
-
-        if abs(prev_loss - loss.item()) < tol:
-            print(f"Converged at iteration {i}, loss: {loss.item()}")
-            break
-        prev_loss = loss.item()
-        
-        # Backpropagation and optimization step - Clear gradients, compute gradients, update weights
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-    return W, H, loss_list
-
-
-# -----------------------------------------------------
-# 2. PLOT RESULTS
-# -----------------------------------------------------
-def plot_result(original_img, masked_img, reconstructed_img, rank, mask_value):
-    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-    fig.suptitle(f"Image Reconstruction with Rank={rank} and Mask={mask_value}x{mask_value} patch")
-
-    # Original image
-    axes[0].imshow(rearrange(original_img, 'c h w -> h w c').cpu().numpy())
-    axes[0].set_title("Original Image")
-    axes[0].axis('off')
-
-    # Masked image
-    axes[1].imshow(rearrange(masked_img, 'c h w -> h w c').cpu().numpy())
-    axes[1].set_title("Masked Image")
-    axes[1].axis('off')
-
-    # Reconstructed image
-    axes[2].imshow(rearrange(reconstructed_img, 'c h w -> h w c').cpu().detach().numpy())
-    axes[2].set_title("Reconstructed Image")
-    axes[2].axis('off')
-
-    plt.show()
-
-
-# -----------------------------------------------------
-# 3. RMSE + PSNR METRICS
-# -----------------------------------------------------
-def calculate_rmse_psnr(original_img, reconstructed_img):
-    if original_img.device != reconstructed_img.device:
-        original_img = original_img.to(reconstructed_img.device)
-
-    mse = F.mse_loss(reconstructed_img, original_img)
-    rmse = torch.sqrt(mse)
-    psnr = 20 * torch.log10(1.0 / rmse) # Max pixel value is 1.0 since we normalized the image
-    print(f"RMSE: {rmse.item():.6f}, PSNR: {psnr.item():.6f}")
-    return rmse.item(), psnr.item()
-
-# -----------------------------------------------------
-# 4. FULL IMAGE RECONSTRUCTION PIPELINE
-# -----------------------------------------------------
-def image_reconstruction_matrix(img, masked_img, rank=20, learning_rate=1e-4, num_epochs=5000,
-                                tol=1e-6, plot=True, device=torch.device("cpu")):
-    img = img.to(torch.float32)
-    masked_img = masked_img.to(torch.float32)
-
-    # Perform matrix factorization
-    W, H, loss_list = matrix_factorization_gradient(masked_rect, rank, learning_rate, num_epochs, tol, device)
-
-    # Reconstruct
-    reconstructed_img = torch.einsum('chr,crw->chw', W, H) # Matrix Multiplication
-    reconstructed_img = torch.clamp(reconstructed_img, 0, 1) # If value > 1, set to 1, if value < 0, set to 0
-
-    # Keep known pixels from original
-    mask = ~torch.isnan(masked_img)
-    reconstructed_img[mask] = img[mask]
-
-    # Metrics
-    rmse, psnr = calculate_rmse_psnr(img, reconstructed_img)
-
-    if plot:
-        plot_result(img, masked_img, reconstructed_img, rank, mask_value=30)
-
-    return reconstructed_img, loss_list, rmse, psnr
-
-```
-
-
-```python
-reconstructed_img, loss_list, rmse, psnr = image_reconstruction_matrix(img_cropped, masked_rect, rank=50, learning_rate=0.01, num_epochs=10000, tol=1e-6, plot=True, device=device)
-
-```
-
-    Iteration 1000, loss: 34.76765441894531
-    Iteration 2000, loss: 27.726158142089844
-    Iteration 3000, loss: 24.599828720092773
-    Converged at iteration 3648, loss: 23.337982177734375
-    RMSE: 0.007352, PSNR: 42.671894
-    
-
-
-    
-![png](Task4_PART_A_files/Task4_PART_A_6_1.png)
-    
-
-
-
-```python
-ranks = [5, 10, 20, 50, 100, 150, 200, 400]
-results_patch_rect_grad = {}
-reconstructed_images_patch_rect_grad = {}
-
-for rank in ranks:
-    print("-"*50)
-    print(f"Evaluating rank: {rank}")
-    print("-"*50)
-    reconstructed_img_rect_grad, loss_list_rect_grad, rmse_rect_grad, psnr_rect_grad = image_reconstruction_matrix(
-        img_cropped, masked_rect, rank, learning_rate=0.01, num_epochs=10000, plot=True, device=device
-    )
-    results_patch_rect_grad[rank] = {'Loss': loss_list_rect_grad[-1], 'RMSE': rmse_rect_grad, 'PSNR': psnr_rect_grad}
-    reconstructed_images_patch_rect_grad[rank] = reconstructed_img_rect_grad
-    print("\n\n")
-```
 
     --------------------------------------------------
     Evaluating rank: 5
@@ -462,37 +168,10 @@ for rank in ranks:
     
 
 
+ ### Image Reconstruction with Varying Rank: 
     
     
     
-    
-
-
-```python
-# Show original image, masked image once, and then reconstructed image for each rank
-plt.figure(figsize=(8, 4))
-plt.suptitle("Image Reconstruction with varying Rank")
-# Plot original image
-plt.subplot(1, 2, 1)
-plt.imshow(rearrange(img_cropped, 'c h w -> h w c').cpu().numpy())
-plt.title("Original Image")
-plt.axis('off')
-# Plot masked image
-plt.subplot(1, 2, 2)
-plt.imshow(rearrange(masked_rect, 'c h w -> h w c').cpu().numpy())
-plt.title("Masked Image")
-plt.axis('off')
-plt.show()
-
-plt.figure(figsize=(20, 10))
-# Plot reconstructed images for each rank
-for i, rank in enumerate(ranks):
-    plt.subplot(2, (len(ranks)+1)//2, i+1)
-    plt.imshow(rearrange(reconstructed_images_patch_rect_grad[rank], 'c h w -> h w c').cpu().detach().numpy())
-    plt.title(f"Rank={rank}")
-    plt.axis('off')
-plt.show()
-```
 
 
     
@@ -507,32 +186,7 @@ plt.show()
 
 
 
-```python
-for rank, metrics in results_patch_rect_grad.items():
-    print(f"Rank: {rank}, Loss: {metrics['Loss']:.4f}, RMSE: {metrics['RMSE']:.4f}, PSNR: {metrics['PSNR']:.4f}")
-ranks_list_rect_grad = list(results_patch_rect_grad.keys())
-loss_list_rect_grad = [metrics['Loss'] for metrics in results_patch_rect_grad.values()]
-rmse_list_rect_grad = [metrics['RMSE'] for metrics in results_patch_rect_grad.values()]
-psnr_list_rect_grad = [metrics['PSNR'] for metrics in results_patch_rect_grad.values()]
-
-plt.figure(figsize=(15, 5))
-plt.subplot(1, 3, 1)
-plt.plot(ranks_list_rect_grad, loss_list_rect_grad, marker='o')
-plt.xlabel('Rank')
-plt.ylabel('Loss')
-plt.title('Loss vs. Rank')
-plt.subplot(1, 3, 2)
-plt.plot(ranks_list_rect_grad, rmse_list_rect_grad, marker='o')
-plt.xlabel('Rank')
-plt.ylabel('RMSE')
-plt.title('RMSE vs. Rank')
-plt.subplot(1, 3, 3)
-plt.plot(ranks_list_rect_grad, psnr_list_rect_grad, marker='o')
-plt.xlabel('Rank')
-plt.ylabel('PSNR')
-plt.title('PSNR vs. Rank')
-plt.show()
-```
+PLots: 
 
     Rank: 5, Loss: 62.4211, RMSE: 0.0110, PSNR: 39.2066
     Rank: 10, Loss: 50.3070, RMSE: 0.0098, PSNR: 40.1824
@@ -550,66 +204,20 @@ plt.show()
     
 
 
-
-```python
-best_psnr_rect_grad = max(psnr_list_rect_grad)
-best_psnr_idx_rect_grad = psnr_list_rect_grad.index(best_psnr_rect_grad)
-best_rank_rect_grad = ranks_list_rect_grad[best_psnr_idx_rect_grad]
-best_rmse_rect_grad = rmse_list_rect_grad[best_psnr_idx_rect_grad]
-
-print("Optimal Rank and Metrics:\n")
-print(f"Rank: {best_rank_rect_grad}")
-print(f"PSNR: {best_psnr_rect_grad:.4f}")
-print(f"RMSE: {best_rmse_rect_grad:.4f}")
-```
+### Optimal Rank and Matrix:
 
     Optimal Rank and Metrics:
     
     Rank: 50
     PSNR: 41.0206
     RMSE: 0.0089
-    
-
-
-```python
-reconstructed_random_grad, loss_random_grad, rmse_random_grad, psnr_random_grad = image_reconstruction_matrix(
-    img_cropped, masked_rand, rank=20, learning_rate=0.01, num_epochs=10000, tol=1e-6, plot=True, device=torch.device("cpu")
-)
-
-```
-
-    Iteration 1000, loss: 48.427162170410156
-    Iteration 2000, loss: 41.2430305480957
-    Iteration 3000, loss: 38.39360809326172
-    Iteration 4000, loss: 37.45574188232422
-    Converged at iteration 4498, loss: 37.30405044555664
-    RMSE: 0.006421, PSNR: 43.847729
-    
-
 
     
-![png](Task4_PART_A_files/Task4_PART_A_11_1.png)
-    
 
 
 
-```python
-ranks = [5, 10, 20, 50, 100, 150, 200, 400]
-results_patch_random_grad = {}
-reconstructed_images_patch_random_grad = {}
+Image Reconstruction with Varying Rank using Gradient Descent on Random 900 Pixels:
 
-for rank in ranks:
-    print("-"*50)
-    print(f"Evaluating rank: {rank}")
-    print("-"*50)
-    reconstructed_img_random_grad, loss_list_random_grad, rmse_random_grad, psnr_random_grad = image_reconstruction_matrix(
-        img_cropped, masked_rand, rank, learning_rate=0.01, num_epochs=10000, plot=True, device=device
-    )
-
-    results_patch_random_grad[rank] = {'Loss': loss_list_random_grad[-1], 'RMSE': rmse_random_grad, 'PSNR': psnr_random_grad}
-    reconstructed_images_patch_random_grad[rank] = reconstructed_img_random_grad
-    print("\n\n")
-```
 
     --------------------------------------------------
     Evaluating rank: 5
@@ -772,34 +380,7 @@ for rank in ranks:
     
     
     
-
-
-```python
-
-# Show original image, masked image once, and then reconstructed image for each rank
-plt.figure(figsize=(8, 4))
-plt.suptitle("Image Reconstruction with varying Rank")
-# Plot original image
-plt.subplot(1, 2, 1)
-plt.imshow(rearrange(img_cropped, 'c h w -> h w c').cpu().numpy())
-plt.title("Original Image")
-plt.axis('off')
-# Plot masked image
-plt.subplot(1, 2, 2)
-plt.imshow(rearrange(masked_rand, 'c h w -> h w c').cpu().numpy())
-plt.title("Masked Image")
-plt.axis('off')
-plt.show()
-
-plt.figure(figsize=(20, 10))
-# Plot reconstructed images for each rank
-for i, rank in enumerate(ranks):
-    plt.subplot(2, (len(ranks)+1)//2, i+1)
-    plt.imshow(rearrange(reconstructed_images_patch_random_grad[rank], 'c h w -> h w c').cpu().detach().numpy())
-    plt.title(f"Rank={rank}")
-    plt.axis('off')
-plt.show()
-```
+Image Reconstruction with Varying Rank using Gradient Descent on Missing 900 Pixels:
 
 
     
@@ -813,33 +394,7 @@ plt.show()
     
 
 
-
-```python
-for rank, metrics in results_patch_random_grad.items():
-    print(f"Rank: {rank}, Loss: {metrics['Loss']:.4f}, RMSE: {metrics['RMSE']:.4f}, PSNR: {metrics['PSNR']:.4f}")
-ranks_list_random_grad = list(results_patch_random_grad.keys())
-loss_list_random_grad = [metrics['Loss'] for metrics in results_patch_random_grad.values()]
-rmse_list_random_grad = [metrics['RMSE'] for metrics in results_patch_random_grad.values()]
-psnr_list_random_grad = [metrics['PSNR'] for metrics in results_patch_random_grad.values()]
-
-plt.figure(figsize=(15, 5))
-plt.subplot(1, 3, 1)
-plt.plot(ranks_list_random_grad, loss_list_random_grad, marker='o')
-plt.xlabel('Rank')
-plt.ylabel('Loss')
-plt.title('Loss vs. Rank')
-plt.subplot(1, 3, 2)
-plt.plot(ranks_list_random_grad, rmse_list_random_grad, marker='o')
-plt.xlabel('Rank')
-plt.ylabel('RMSE')
-plt.title('RMSE vs. Rank')
-plt.subplot(1, 3, 3)
-plt.plot(ranks_list_random_grad, psnr_list_random_grad, marker='o')
-plt.xlabel('Rank')
-plt.ylabel('PSNR')
-plt.title('PSNR vs. Rank')
-plt.show()
-```
+Plots:
 
     Rank: 5, Loss: 62.4280, RMSE: 0.0114, PSNR: 38.8628
     Rank: 10, Loss: 49.7393, RMSE: 0.0090, PSNR: 40.8731
@@ -856,19 +411,7 @@ plt.show()
 ![png](Task4_PART_A_files/Task4_PART_A_14_1.png)
     
 
-
-
-```python
-best_psnr_random_grad = max(psnr_list_random_grad)
-best_psnr_idx_random_grad = psnr_list_random_grad.index(best_psnr_random_grad)
-best_rank_random_grad = ranks_list_random_grad[best_psnr_idx_random_grad]
-best_rmse_random_grad = rmse_list_random_grad[best_psnr_idx_random_grad]
-
-print("Optimal Rank and Metrics:\n")
-print(f"Rank: {best_rank_random_grad}")
-print(f"PSNR: {best_psnr_random_grad:.4f}")
-print(f"RMSE: {best_rmse_random_grad:.4f}")
-```
+Optimal Value of Rank:
 
     Optimal Rank and Metrics:
     
@@ -876,175 +419,7 @@ print(f"RMSE: {best_rmse_random_grad:.4f}")
     PSNR: 52.3621
     RMSE: 0.0024
     
-
-
-```python
-import torch
-import torch.nn.functional as F
-from einops import rearrange
-import matplotlib.pyplot as plt
-
-# -----------------------------------------------------
-# 1. MATRIX FACTORIZATION USING ALS
-# -----------------------------------------------------
-def matrix_factorization_als(M, r=20, steps=100, tol=1e-5, device=torch.device("cpu")):
-    C, H, W = M.shape
-    M = M.to(device)
-    
-    W_list = torch.empty(C, H, r, device=device)
-    H_list = torch.empty(C, r, W, device=device)
-    loss_list = [[] for _ in range(C)]
-
-    for c in range(C):
-        mask = ~torch.isnan(M[c])
-        M_channel = M[c].clone()
-        M_channel[~mask] = 0.0
-
-        U = torch.rand(H, r, device=device)
-        V = torch.rand(W, r, device=device)
-
-        prev_loss = float('inf')
-
-        for step in range(1, steps + 1):
-            # --- Update U ---
-            for i in range(H): # For each row
-                cols = mask[i] # Known pixels in this row
-                if cols.sum() == 0: # If no known pixels, then skip this row
-                    continue
-                V_sub = V[cols] # Select only the columns with known pixels
-                M_sub = M_channel[i, cols] # take corresponding known pixels
-                sol = torch.linalg.lstsq(V_sub, M_sub.unsqueeze(1)).solution.squeeze() # Solve Ax = b using least squares
-                U[i] = sol
-
-            # --- Update V ---
-            for j in range(W):
-                rows = mask[:, j]
-                if rows.sum() == 0:
-                    continue
-                U_sub = U[rows]
-                M_sub = M_channel[rows, j]
-                sol = torch.linalg.lstsq(U_sub, M_sub.unsqueeze(1)).solution.squeeze()
-                V[j] = sol
-
-            # --- Compute loss ---
-            M_pred = U @ V.T
-            error = (M_channel - M_pred)[mask]
-            loss = torch.sqrt((error ** 2).mean())
-            loss_list[c].append(loss.item())
-
-            if step % 10 == 0:
-                print(f"Channel {c}, Step {step}, RMSE={loss.item():.6f}")
-
-            if abs(prev_loss - loss.item()) < tol:
-                print(f"Channel {c} converged at step {step}, RMSE={loss.item():.6f}")
-                break
-            prev_loss = loss.item()
-
-        W_list[c] = U
-        H_list[c] = V.T
-
-    return W_list, H_list, loss_list
-
-
-# -----------------------------------------------------
-# 2. METRICS AND VISUALIZATION
-# -----------------------------------------------------
-def calculate_rmse_psnr(original_img, reconstructed_img):
-    mse = F.mse_loss(reconstructed_img, original_img)
-    rmse = torch.sqrt(mse)
-    psnr = 20 * torch.log10(1.0 / rmse)
-    print(f"RMSE: {rmse.item():.6f}, PSNR: {psnr.item():.6f}")
-    return rmse.item(), psnr.item()
-
-
-def plot_result(original_img, masked_img, reconstructed_img, rank, mask_value):
-    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-    fig.suptitle(f"Image Reconstruction with Rank={rank} and Mask={mask_value}x{mask_value}")
-    axes[0].imshow(rearrange(original_img, 'c h w -> h w c').cpu().numpy()); axes[0].set_title("Original")
-    axes[1].imshow(rearrange(masked_img, 'c h w -> h w c').cpu().numpy()); axes[1].set_title("Masked")
-    axes[2].imshow(rearrange(reconstructed_img, 'c h w -> h w c').cpu().detach().numpy()); axes[2].set_title("Reconstructed")
-    for ax in axes: ax.axis('off')
-    plt.show()
-
-
-# -----------------------------------------------------
-# 3. FULL IMAGE RECONSTRUCTION PIPELINE
-# -----------------------------------------------------
-def image_reconstruction_matrix_als(img, masked_img, rank=20, tol=1e-5, plot=True, device=torch.device("cpu")):
-    img = img.to(torch.float32)
-    masked_img = masked_img.to(torch.float32)
-
-    # Perform ALS factorization
-    W, H, loss_list = matrix_factorization_als(masked_img, r=rank, steps=100, tol=tol, device=device)
-
-    # Reconstruction
-    reconstructed_img = torch.einsum('chr,crw->chw', W, H)
-    reconstructed_img = torch.clamp(reconstructed_img, 0, 1)
-
-    mask = ~torch.isnan(masked_img)
-    reconstructed_img[mask] = img[mask]
-
-    rmse, psnr = calculate_rmse_psnr(img, reconstructed_img)
-
-    if plot:
-        plot_result(img, masked_img, reconstructed_img, rank, mask_value=30)
-
-    return reconstructed_img, loss_list, rmse, psnr
-
-```
-
-
-```python
-# Rectangular block reconstruction
-reconstructed_rect_als, loss_rect_als, rmse_rect_als, psnr_rect_als = image_reconstruction_matrix_als(
-    img_cropped, masked_rect, rank=20, plot=True
-)
-
-# # Random pixels reconstruction
-# reconstructed_rand_als, loss_rand_als, rmse_rand_als, psnr_rand_als = image_reconstruction_matrix(
-#     img_cropped, masked_rand, rank=20, plot=True
-# )
-
-
-```
-
-    Channel 0, Step 10, RMSE=0.070397
-    Channel 0 converged at step 13, RMSE=0.070357
-    Channel 1, Step 10, RMSE=0.071619
-    Channel 1 converged at step 19, RMSE=0.071506
-    Channel 2, Step 10, RMSE=0.072655
-    Channel 2 converged at step 18, RMSE=0.072505
-    RMSE: 0.009913, PSNR: 40.076271
-    
-
-
-    
-![png](Task4_PART_A_files/Task4_PART_A_17_1.png)
-    
-
-
-
-```python
-ranks = [5, 10, 20, 50, 100, 150, 200, 400]
-results_patch_rect_als = {}
-reconstructed_images_patch_rect_als = {}
-
-for rank in ranks:
-    print("-"*50)
-    print(f"Evaluating rank: {rank}")
-    print("-"*50)
-    reconstructed_img_rect_als, loss_list_rect_als, rmse_rect_als, psnr_rect_als = image_reconstruction_matrix_als(
-    img_cropped, masked_rect, rank, plot=True
-)
-
-    results_patch_rect_als[rank] = {'Loss': loss_list_rect_als[-1], 'RMSE': rmse_rect_als, 'PSNR': psnr_rect_als}
-    reconstructed_images_patch_rect_als[rank] = reconstructed_img_rect_als
-    print("\n\n")
-
-
-
-
-```
+Image Reconstruction with Varying Rank using Alternating Least Squares on Rectangular Patch:
 
     --------------------------------------------------
     Evaluating rank: 5
@@ -1213,34 +588,7 @@ for rank in ranks:
     
     
 
-
-```python
-
-# Show original image, masked image once, and then reconstructed image for each rank
-plt.figure(figsize=(8, 4))
-plt.suptitle("Image Reconstruction with varying Rank")
-# Plot original image
-plt.subplot(1, 2, 1)
-plt.imshow(rearrange(img_cropped, 'c h w -> h w c').cpu().numpy())
-plt.title("Original Image")
-plt.axis('off')
-# Plot masked image
-plt.subplot(1, 2, 2)
-plt.imshow(rearrange(masked_rect, 'c h w -> h w c').cpu().numpy())
-plt.title("Masked Image")
-plt.axis('off')
-plt.show()
-
-plt.figure(figsize=(20, 10))
-# Plot reconstructed images for each rank
-for i, rank in enumerate(ranks):
-    plt.subplot(2, (len(ranks)+1)//2, i+1)
-    plt.imshow(rearrange(reconstructed_images_patch_rect_als[rank], 'c h w -> h w c').cpu().detach().numpy())
-    plt.title(f"Rank={rank}")
-    plt.axis('off')
-plt.show()
-```
-
+Image Reconstruction with Varying Rank using Alternating Least Squares on Rectangular Patch:
 
     
 ![png](Task4_PART_A_files/Task4_PART_A_19_0.png)
@@ -1253,43 +601,7 @@ plt.show()
     
 
 
-
-```python
-for rank_als, metrics_als in results_patch_rect_als.items():
-    final_loss_als = metrics_als['Loss'][-1] if isinstance(metrics_als['Loss'], list) else metrics_als['Loss']
-    print(f"Rank: {rank_als}, Loss: {final_loss_als:.4f}, RMSE: {metrics_als['RMSE']:.4f}, PSNR: {metrics_als['PSNR']:.4f}")
-
-ranks_list_rect_als = list(results_patch_rect_als.keys())
-loss_list_rect_als = [
-    metrics['Loss'][-1] if isinstance(metrics['Loss'], list) else metrics['Loss']
-    for metrics in results_patch_rect_als.values()
-]
-rmse_list_rect_als = [metrics['RMSE'] for metrics in results_patch_rect_als.values()]
-psnr_list_rect_als = [metrics['PSNR'] for metrics in results_patch_rect_als.values()]
-
-plt.figure(figsize=(15, 5))
-plt.subplot(1, 3, 1)
-plt.plot(ranks_list_rect_als, loss_list_rect_als, marker='o')
-plt.xlabel('Rank')
-plt.ylabel('Loss')
-plt.title('Loss vs. Rank')
-
-plt.subplot(1, 3, 2)
-plt.plot(ranks_list_rect_als, rmse_list_rect_als, marker='o')
-plt.xlabel('Rank')
-plt.ylabel('RMSE')
-plt.title('RMSE vs. Rank')
-
-plt.subplot(1, 3, 3)
-plt.plot(ranks_list_rect_als, psnr_list_rect_als, marker='o')
-plt.xlabel('Rank')
-plt.ylabel('PSNR')
-plt.title('PSNR vs. Rank')
-
-plt.tight_layout()
-plt.show()
-
-```
+Plots:
 
     Rank: 5, Loss: 0.0725, RMSE: 0.0096, PSNR: 40.3754
     Rank: 10, Loss: 0.0725, RMSE: 0.0088, PSNR: 41.1574
@@ -1306,19 +618,7 @@ plt.show()
 ![png](Task4_PART_A_files/Task4_PART_A_20_1.png)
     
 
-
-
-```python
-best_psnr_rect_als = max(psnr_list_rect_als)
-best_psnr_idx_rect_als = psnr_list_rect_als.index(best_psnr_rect_als)
-best_rank_rect_als = ranks_list_rect_als[best_psnr_idx_rect_als]
-best_rmse_rect_als = rmse_list_rect_als[best_psnr_idx_rect_als]
-
-print("Optimal Rank and Metrics:\n")
-print(f"Rank: {best_rank_rect_als}")
-print(f"PSNR: {best_psnr_rect_als:.4f}")
-print(f"RMSE: {best_rmse_rect_als:.4f}")
-```
+Optimal Value of Rank:
 
     Optimal Rank and Metrics:
     
@@ -1328,50 +628,10 @@ print(f"RMSE: {best_rmse_rect_als:.4f}")
     
 
 
-```python
-# Random pixels reconstruction
-reconstructed_rand_als, loss_rand_als, rmse_rand_als, psnr_rand_als = image_reconstruction_matrix_als(
-    img_cropped, masked_rand, rank=20, plot=True
-)
 
 
-```
+Image Reconstruction with Varying Rank using Alternating Least Squares on 900 Missing Pixels:
 
-    Channel 0, Step 10, RMSE=0.070403
-    Channel 0, Step 20, RMSE=0.070229
-    Channel 0 converged at step 21, RMSE=0.070220
-    Channel 1, Step 10, RMSE=0.071469
-    Channel 1 converged at step 16, RMSE=0.071365
-    Channel 2, Step 10, RMSE=0.072375
-    Channel 2 converged at step 13, RMSE=0.072324
-    RMSE: 0.007654, PSNR: 42.322502
-    
-
-
-    
-![png](Task4_PART_A_files/Task4_PART_A_22_1.png)
-    
-
-
-
-```python
-ranks = [5, 10, 20, 50, 100, 150, 200, 400]
-results_patch_rand_als = {}
-reconstructed_images_patch_rand_als = {}
-
-for rank in ranks:
-    print("-"*50)
-    print(f"Evaluating rank: {rank}")
-    print("-"*50)
-    reconstructed_img_rand_als, loss_list_rand_als, rmse_rand_als, psnr_rand_als = image_reconstruction_matrix_als(
-        img_cropped, masked_rand, rank, plot=True
-    )
-    
-
-    results_patch_rand_als[rank] = {'Loss': loss_list_rand_als[-1], 'RMSE': rmse_rand_als, 'PSNR': psnr_rand_als}
-    reconstructed_images_patch_rand_als[rank] = reconstructed_img_rand_als
-    print("\n\n")
-```
 
     --------------------------------------------------
     Evaluating rank: 5
@@ -1541,35 +801,8 @@ for rank in ranks:
     
     
     
-    
+Image Reconstruction with Varying Rank using Alternating Least Squares on 900 Random Pixels:
 
-
-```python
-
-# Show original image, masked image once, and then reconstructed image for each rank
-plt.figure(figsize=(8, 4))
-plt.suptitle("Image Reconstruction with varying Rank")
-# Plot original image
-plt.subplot(1, 2, 1)
-plt.imshow(rearrange(img_cropped, 'c h w -> h w c').cpu().numpy())
-plt.title("Original Image")
-plt.axis('off')
-# Plot masked image
-plt.subplot(1, 2, 2)
-plt.imshow(rearrange(masked_rand, 'c h w -> h w c').cpu().numpy())
-plt.title("Masked Image")
-plt.axis('off')
-plt.show()
-
-plt.figure(figsize=(20, 10))
-# Plot reconstructed images for each rank
-for i, rank in enumerate(ranks):
-    plt.subplot(2, (len(ranks)+1)//2, i+1)
-    plt.imshow(rearrange(reconstructed_images_patch_rand_als[rank], 'c h w -> h w c').cpu().detach().numpy())
-    plt.title(f"Rank={rank}")
-    plt.axis('off')
-plt.show()
-```
 
 
     
@@ -1584,42 +817,7 @@ plt.show()
 
 
 
-```python
-for rank_als_random, metrics_als_random in results_patch_rand_als.items():
-    final_loss_rand_als = metrics_als_random['Loss'][-1] if isinstance(metrics_als_random['Loss'], list) else metrics_als_random['Loss']
-    print(f"Rank: {rank_als_random}, Loss: {final_loss_rand_als:.4f}, RMSE: {metrics_als_random['RMSE']:.4f}, PSNR: {metrics_als_random['PSNR']:.4f}")
-
-ranks_list_rand_als = list(results_patch_rand_als.keys())
-loss_list_rand_als = [
-    metrics['Loss'][-1] if isinstance(metrics['Loss'], list) else metrics['Loss']
-    for metrics in results_patch_rand_als.values()
-]
-rmse_list_rand_als = [metrics['RMSE'] for metrics in results_patch_rand_als.values()]
-psnr_list_rand_als = [metrics['PSNR'] for metrics in results_patch_rand_als.values()]
-
-plt.figure(figsize=(15, 5))
-plt.subplot(1, 3, 1)
-plt.plot(ranks_list_rand_als, loss_list_rand_als, marker='o')
-plt.xlabel('Rank')
-plt.ylabel('Loss')
-plt.title('Loss vs. Rank')
-
-plt.subplot(1, 3, 2)
-plt.plot(ranks_list_rand_als, rmse_list_rand_als, marker='o')
-plt.xlabel('Rank')
-plt.ylabel('RMSE')
-plt.title('RMSE vs. Rank')
-
-plt.subplot(1, 3, 3)
-plt.plot(ranks_list_rand_als, psnr_list_rand_als, marker='o')
-plt.xlabel('Rank')
-plt.ylabel('PSNR')
-plt.title('PSNR vs. Rank')
-
-plt.tight_layout()
-plt.show()
-
-```
+Plots:
 
     Rank: 5, Loss: 0.1262, RMSE: 0.0118, PSNR: 38.5595
     Rank: 10, Loss: 0.0995, RMSE: 0.0098, PSNR: 40.2184
@@ -1637,18 +835,7 @@ plt.show()
     
 
 
-
-```python
-best_psnr_rand_als = max(psnr_list_rand_als)
-best_psnr_idx_rand_als = psnr_list_rand_als.index(best_psnr_rand_als)
-best_rank_rand_als = ranks_list_rand_als[best_psnr_idx_rand_als]
-best_rmse_rand_als = rmse_list_rand_als[best_psnr_idx_rand_als]
-
-print("Optimal Rank and Metrics:\n")
-print(f"Rank: {best_rank_rand_als}")
-print(f"PSNR: {best_psnr_rand_als:.4f}")
-print(f"RMSE: {best_rmse_rand_als:.4f}")
-```
+Optimal Value of Rank:
 
     Optimal Rank and Metrics:
     
